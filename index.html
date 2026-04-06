@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>支払い管理</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f2f2f7;
+      --card-bg: #ffffff;
+      --text-primary: #1c1c1e;
+      --text-secondary: #8e8e93;
+      --accent: #7c7aff;
+      --positive: #34c759;
+      --danger: #ff3b30;
+      --radius: 14px;
+      --tab-height: 56px;
+    }
+
+    html, body {
+      height: 100%;
+      background: #e5e5ea;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+
+    .phone {
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      border-radius: 48px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Top tabs ── */
+    .top-tabs {
+      display: flex;
+      gap: 10px;
+      padding: 56px 16px 12px;
+      background: var(--bg);
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      padding: 10px 22px;
+      border-radius: 20px;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'Noto Sans JP', sans-serif;
+      border: none;
+      cursor: pointer;
+      transition: background 0.22s, color 0.22s;
+      letter-spacing: 0.01em;
+    }
+    .tab-btn.is-active   { background: var(--accent); color: #fff; }
+    .tab-btn.is-inactive { background: #e0e0e5; color: var(--text-secondary); }
+
+    .tab-arrow {
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; flex-shrink: 0;
+      color: var(--text-secondary);
+      transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    /* ── Scroll area ── */
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 16px 80px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll-area::-webkit-scrollbar { display: none; }
+
+    .section-label {
+      font-size: 13px; font-weight: 500;
+      color: var(--text-secondary);
+      padding: 16px 4px 8px;
+      letter-spacing: 0.02em;
+    }
+
+    .card-list {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .card-item {
+      background: var(--card-bg);
+      padding: 16px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 0.5px solid rgba(0,0,0,0.06);
+    }
+    .card-item:last-child { border-bottom: none; }
+
+    .card-date   { font-size: 15px; color: var(--text-primary); }
+    .card-amount { font-size: 15px; color: var(--text-primary); font-weight: 500; }
+
+    .empty-msg {
+      padding: 16px 18px;
+      font-size: 14px; color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .summary-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 24px;
+    }
+    .summary-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 0;
+    }
+    .summary-row:first-child { padding-top: 0; }
+    .summary-label  { font-size: 15px; color: var(--text-primary); }
+    .summary-amount { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+    .summary-amount.positive { color: var(--positive); }
+    .summary-amount.negative { color: var(--danger); }
+
+    /* ── FAB ── */
+    .fab {
+      position: absolute;
+      bottom: calc(var(--tab-height) + 20px);
+      right: 20px;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; color: #fff;
+      box-shadow: 0 4px 16px rgba(124,122,255,0.45);
+      transition: transform 0.15s, box-shadow 0.15s;
+      z-index: 10;
+    }
+    .fab:active { transform: scale(0.93); }
+
+    .bottom-bar {
+      height: var(--tab-height);
+      background: rgba(248,248,248,0.94);
+      border-top: 0.5px solid rgba(0,0,0,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: var(--text-secondary);
+      flex-shrink: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    /* ── Slide animations ── */
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .anim-right { animation: slideInRight 0.22s ease forwards; }
+    .anim-left  { animation: slideInLeft  0.22s ease forwards; }
+
+    /* ── Modal overlay ── */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 50;
+      display: flex;
+      align-items: flex-end;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      background: var(--bg);
+      border-radius: 24px 24px 0 0;
+      padding-bottom: 32px;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+    }
+    .modal-overlay.open .modal-sheet { transform: translateY(0); }
+
+    .modal-handle {
+      width: 36px; height: 4px;
+      background: #c7c7cc;
+      border-radius: 2px;
+      margin: 12px auto 0;
+    }
+
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 20px 10px;
+    }
+    .modal-title { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+
+    .modal-close {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: #e0e0e5;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; color: var(--text-secondary);
+    }
+
+    /* ── Form ── */
+    .form-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      margin: 0 16px 10px;
+      overflow: hidden;
+    }
+
+    .form-row {
+      display: flex; align-items: center;
+      padding: 13px 18px;
+      border-bottom: 0.5px solid rgba(0,0,0,0.06);
+      gap: 12px;
+    }
+    .form-row:last-child { border-bottom: none; }
+
+    .form-label {
+      font-size: 15px; color: var(--text-primary);
+      min-width: 72px;
+    }
+
+    .form-input {
+      flex: 1; border: none; outline: none;
+      font-size: 15px; font-family: 'Noto Sans JP', sans-serif;
+      color: var(--text-primary);
+      background: transparent;
+      text-align: right;
+    }
+    .form-input::placeholder { color: #c7c7cc; }
+    input[type="datetime-local"] { color-scheme: light; }
+
+    /* toggle buttons */
+    .toggle-group { display: flex; gap: 6px; margin-left: auto; }
+
+    .tgl {
+      padding: 6px 13px;
+      border-radius: 12px;
+      font-size: 13px; font-weight: 500;
+      font-family: 'Noto Sans JP', sans-serif;
+      border: none; cursor: pointer;
+      transition: background 0.18s, color 0.18s;
+    }
+    .tgl-off    { background: #e0e0e5; color: var(--text-secondary); }
+    .tgl-red    { background: var(--danger);   color: #fff; }
+    .tgl-green  { background: var(--positive); color: #fff; }
+    .tgl-purple { background: var(--accent);   color: #fff; }
+
+    .submit-btn {
+      display: block; width: calc(100% - 32px);
+      margin: 4px 16px 0;
+      padding: 15px;
+      background: var(--accent);
+      color: #fff;
+      border: none; border-radius: var(--radius);
+      font-size: 16px; font-weight: 600;
+      font-family: 'Noto Sans JP', sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: opacity 0.15s, transform 0.12s;
+    }
+    .submit-btn:active { opacity: 0.85; transform: scale(0.98); }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- Top tabs -->
+  <div class="top-tabs">
+    <button class="tab-btn is-active" id="tabA" onclick="switchPage('A')">テキスト</button>
+    <div class="tab-arrow" id="arrowEl">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="10" x2="17" y2="10"/>
+        <polyline points="12 5 17 10 12 15"/>
+      </svg>
+    </div>
+    <button class="tab-btn is-inactive" id="tabB" onclick="switchPage('B')">テキスト</button>
+  </div>
+
+  <!-- Scroll area -->
+  <div class="scroll-area" id="scrollArea"></div>
+
+  <!-- FAB -->
+  <button class="fab" onclick="openModal()">＋</button>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar">メニューバー</div>
+
+  <!-- ── Add modal ── -->
+  <div class="modal-overlay" id="modalOverlay" onclick="bgClose(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <span class="modal-title">支払いを追加</span>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+
+      <!-- 基本情報 -->
+      <div class="form-section">
+        <div class="form-row">
+          <span class="form-label">日時</span>
+          <input class="form-input" type="datetime-local" id="inputDate" />
+        </div>
+        <div class="form-row">
+          <span class="form-label">金額</span>
+          <input class="form-input" type="number" id="inputAmount" placeholder="0" min="0" />
+          <span style="font-size:15px;color:var(--text-secondary);flex-shrink:0;">円</span>
+        </div>
+        <div class="form-row">
+          <span class="form-label">メモ</span>
+          <input class="form-input" type="text" id="inputMemo" placeholder="任意" />
+        </div>
+      </div>
+
+      <!-- 対象・状態 -->
+      <div class="form-section">
+        <div class="form-row">
+          <span class="form-label">対象者</span>
+          <div class="toggle-group">
+            <button class="tgl tgl-purple" id="tgtA" onclick="setTarget('A')">自分</button>
+            <button class="tgl tgl-off"    id="tgtB" onclick="setTarget('B')">相手</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <span class="form-label">状態</span>
+          <div class="toggle-group">
+            <button class="tgl tgl-red"   id="stUnpaid" onclick="setState('unpaid')">未支払い</button>
+            <button class="tgl tgl-off"   id="stPaid"   onclick="setState('paid')">支払い済み</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="submitEntry()">追加する</button>
+    </div>
+  </div>
+
+</div>
+<script>
+  let currentPage = 'A';
+  let addTarget = 'A';
+  let addState  = 'unpaid';
+
+  const dataA = {
+    unpaid: [{date:'2026/04/06 14:00', amount:800}, {date:'2026/04/05 16:00', amount:1200}],
+    paid:   [{date:'2026/04/01 01:00', amount:100}]
+  };
+  const dataB = {
+    unpaid: [{date:'2026/04/04 12:00', amount:1000}],
+    paid:   [{date:'2026/03/30 09:00', amount:500}]
+  };
+
+  function fmtYen(n){ return '¥' + n.toLocaleString(); }
+
+  function renderPage(page, anim){
+    const el = document.getElementById('scrollArea');
+    const data  = page === 'A' ? dataA : dataB;
+    const other = page === 'A' ? dataB : dataA;
+    const unpaidTotal = data.unpaid.reduce((s,r)=>s+r.amount, 0);
+    const otherTotal  = other.unpaid.reduce((s,r)=>s+r.amount, 0);
+    const diff = otherTotal - unpaidTotal;
+    const diffStr   = (diff >= 0 ? '＋' : '－') + fmtYen(Math.abs(diff));
+    const diffClass = diff >= 0 ? 'positive' : 'negative';
+
+    function rows(items){
+      if(!items.length) return '<div class="empty-msg">データなし</div>';
+      return items.map(r=>`
+        <div class="card-item">
+          <span class="card-date">${r.date}</span>
+          <span class="card-amount">${fmtYen(r.amount)}</span>
+        </div>`).join('');
+    }
+
+    el.innerHTML = `
+      <div class="section-label">未支払い</div>
+      <div class="card-list">${rows(data.unpaid)}</div>
+      <div class="section-label">支払い済み</div>
+      <div class="card-list">${rows(data.paid)}</div>
+      <div class="section-label">合計</div>
+      <div class="summary-card">
+        <div class="summary-row">
+          <span class="summary-label">未支払合計</span>
+          <span class="summary-amount">${fmtYen(unpaidTotal)}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">相手との差額</span>
+          <span class="summary-amount ${diffClass}">${diffStr}</span>
+        </div>
+      </div>`;
+
+    if(anim){
+      el.classList.remove('anim-right','anim-left');
+      void el.offsetWidth;
+      el.classList.add(anim);
+    }
+  }
+
+  function switchPage(target){
+    if(target === currentPage) return;
+    const anim = target === 'B' ? 'anim-right' : 'anim-left';
+    currentPage = target;
+    // update tab colours
+    document.getElementById('tabA').className = 'tab-btn ' + (target==='A' ? 'is-active' : 'is-inactive');
+    document.getElementById('tabB').className = 'tab-btn ' + (target==='B' ? 'is-active' : 'is-inactive');
+    // flip arrow
+    document.getElementById('arrowEl').style.transform = target==='B' ? 'scaleX(-1)' : 'scaleX(1)';
+    renderPage(currentPage, anim);
+  }
+
+  /* ── Modal ── */
+  function openModal(){
+    const now = new Date(); now.setSeconds(0,0);
+    document.getElementById('inputDate').value = now.toISOString().slice(0,16);
+    document.getElementById('inputAmount').value = '';
+    document.getElementById('inputMemo').value = '';
+    setTarget(currentPage);
+    setState('unpaid');
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal(){
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  function bgClose(e){
+    if(e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  function setTarget(t){
+    addTarget = t;
+    document.getElementById('tgtA').className = 'tgl ' + (t==='A' ? 'tgl-purple' : 'tgl-off');
+    document.getElementById('tgtB').className = 'tgl ' + (t==='B' ? 'tgl-purple' : 'tgl-off');
+  }
+
+  function setState(s){
+    addState = s;
+    document.getElementById('stUnpaid').className = 'tgl ' + (s==='unpaid' ? 'tgl-red'   : 'tgl-off');
+    document.getElementById('stPaid'  ).className = 'tgl ' + (s==='paid'   ? 'tgl-green' : 'tgl-off');
+  }
+
+  function submitEntry(){
+    const rawDate = document.getElementById('inputDate').value;
+    const amount  = parseInt(document.getElementById('inputAmount').value, 10);
+    if(!rawDate || isNaN(amount) || amount <= 0){
+      alert('日時と金額を正しく入力してください');
+      return;
+    }
+    const d = new Date(rawDate);
+    const p = n => String(n).padStart(2,'0');
+    const dateStr = `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+
+    const data = addTarget === 'A' ? dataA : dataB;
+    data[addState].push({date: dateStr, amount});
+    data[addState].sort((a,b) => b.date.localeCompare(a.date));
+
+    closeModal();
+    renderPage(currentPage, null);
+  }
+
+  // init
+  renderPage('A', null);
+</script>
+</body>
+</html>
