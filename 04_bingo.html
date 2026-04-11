@@ -202,18 +202,18 @@ function cellTap(idx){
 }
 
 function openPicker(currentCell){
-  const all=wantsItems;
+  const all=loadWants();
   if(!all.length){alert('やりたいことリストが空です\n02_wants.htmlでデータを追加してください');return}
   const itemsHTML=all.map(w=>`<div class="pick-item" onclick="pickWants('${w.id}')"><div class="pick-main"><div class="pick-title">${w.title}</div><div class="pick-sub">${w.registrar==='A'?'自分(A)':'相手(B)'} · ${w.status==='done'?'✅ 実行済み':'⏳ 未実行'}</div></div></div>`).join('');
   const clearBtn=currentCell?`<div class="f-card" style="margin-top:6px"><button class="pick-clear" onclick="clearCell()">🗑 このマスを空にする</button></div>`:'';
   document.getElementById('pickerList').innerHTML=`<div class="f-card">${itemsHTML}</div>${clearBtn}<div style="height:8px"></div>`;
   openM('pickerModal');
 }
-function pickWants(wantsId){const w=wantsItems.find(x=>x.id===wantsId);if(!w)return;const season=bingoData.seasons[seasonIdx];season.cells[pickerCellIdx]={wantsId,title:w.title,cleared:w.status==='done'};persist();closeM('pickerModal');render()}
+function pickWants(wantsId){const w=loadWants().find(x=>x.id===wantsId);if(!w)return;const season=bingoData.seasons[seasonIdx];season.cells[pickerCellIdx]={wantsId,title:w.title,cleared:w.status==='done'};persist();closeM('pickerModal');render()}
 function clearCell(){bingoData.seasons[seasonIdx].cells[pickerCellIdx]=null;persist();closeM('pickerModal');render()}
 
 function showCellDetail(cell,idx){
-  const w=wantsItems.find(x=>x.id===cell.wantsId);
+  const w=loadWants().find(x=>x.id===cell.wantsId);
   document.getElementById('cellViewBody').innerHTML=`<div style="padding:4px 16px 12px;font-size:18px;font-weight:700;color:var(--text)">${cell.title}</div><div class="det-row"><span class="det-k">状態</span><span class="det-v">${cell.cleared?'✅ クリア済み':'⏳ 未クリア'}</span></div><div class="det-row"><span class="det-k">マス番号</span><span class="det-v">${idx+1} / 25</span></div>${w?`<div class="det-row"><span class="det-k">登録者</span><span class="det-v">${w.registrar==='A'?'自分(A)':'相手(B)'}</span></div>${w.doneDate?`<div class="det-row"><span class="det-k">実行日</span><span class="det-v">${fmtDate(w.doneDate)}</span></div>`:''} ${w.period?`<div class="det-row"><span class="det-k">期間</span><span class="det-v">${w.period}</span></div>`:''} ${w.memo?`<div class="det-row"><span class="det-k">メモ</span><span class="det-v">${w.memo}</span></div>`:''}`:''}`; 
   openM('cellViewModal');
 }
@@ -224,6 +224,9 @@ function saveReward(){reward=document.getElementById('rewardInput').value.trim()
 function openM(id){document.getElementById(id).classList.add('open')}
 function closeM(id){document.getElementById(id).classList.remove('open')}
 function bgClose(e,id){if(e.target===document.getElementById(id))closeM(id)}
+
+window.addEventListener('focus',()=>{render()});
+window.addEventListener('storage',e=>{if(e.key===WANTS_STORE){render()}});
 
 ensureSeasons();seasonIdx=currentSeasonIdx();render();
 </script>
