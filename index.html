@@ -5,324 +5,192 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>ホーム</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="index_style.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f2f2f7;--card:#fff;--text:#1c1c1e;--sub:#6b7280;--muted:#aeaeb2;
+  --border:rgba(0,0,0,0.07);--accent:#7c7aff;--green:#34c759;
+  --red:#ff3b30;--orange:#ff9500;--pink:#ff2d55;--blue:#007aff;
+  --r:14px;--nav:62px;
+}
+html,body{
+  height:100%;background:#c9c9ce;
+  display:flex;justify-content:center;align-items:center;
+  font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;
+  overscroll-behavior:none;
+}
+.phone{
+  width:min(390px,100vw);
+  height:min(844px,100dvh);
+  background:var(--bg);
+  border-radius:clamp(0px,calc((100vw - 390px)*-99),48px);
+  overflow:hidden;position:relative;display:flex;flex-direction:column;
+  box-shadow:0 40px 80px rgba(0,0,0,.28),0 0 0 1px rgba(0,0,0,.09);
+}
+.hdr{
+  padding:max(52px,env(safe-area-inset-top,52px)) 20px 12px;
+  background:var(--bg);flex-shrink:0;
+  display:flex;align-items:flex-end;justify-content:space-between;
+}
+.hdr-greeting{font-size:13px;color:var(--sub);font-weight:400;margin-bottom:2px}
+.hdr-title{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.hdr-date{font-size:12px;color:var(--muted);margin-top:2px}
+.refresh-btn{
+  width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--card);display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:var(--sub);box-shadow:0 1px 6px rgba(0,0,0,.08);
+  transition:transform .3s,background .15s;flex-shrink:0;margin-bottom:2px;
+}
+.refresh-btn:active{background:#e5e5ea}
+.refresh-btn.spin{animation:spin .5s ease}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.scroll{flex:1;overflow-y:auto;padding:10px 14px 20px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.scroll::-webkit-scrollbar{display:none}
+.sec-lbl{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.07em;text-transform:uppercase;padding:16px 2px 8px}
+.hero-card{border-radius:20px;padding:22px 20px;margin-bottom:10px;background:linear-gradient(135deg,var(--accent) 0%,#a78bfa 100%);color:#fff;position:relative;overflow:hidden}
+.hero-card::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08)}
+.hero-tag{font-size:11px;font-weight:700;opacity:.8;letter-spacing:.06em;margin-bottom:8px}
+.hero-amount{font-size:36px;font-weight:700;line-height:1;margin-bottom:6px;letter-spacing:-.5px}
+.hero-desc{font-size:13px;opacity:.88;line-height:1.5}
+.hero-sub-row{display:flex;gap:8px;margin-top:14px}
+.hero-sub-item{flex:1;background:rgba(255,255,255,.15);border-radius:10px;padding:10px 12px}
+.hero-sub-label{font-size:10px;opacity:.75;font-weight:600;letter-spacing:.04em;margin-bottom:3px}
+.hero-sub-val{font-size:16px;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.stat-card{background:var(--card);border-radius:var(--r);padding:16px 14px}
+.stat-icon{font-size:22px;margin-bottom:8px;display:block}
+.stat-label{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.04em;margin-bottom:4px}
+.stat-value{font-size:22px;font-weight:700;color:var(--text);line-height:1}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.stat-bar-wrap{margin-top:8px;height:4px;background:#f0f0f5;border-radius:2px;overflow:hidden}
+.stat-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.notice-card{background:var(--card);border-radius:var(--r);padding:14px 16px;margin-bottom:6px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:background .12s;-webkit-tap-highlight-color:transparent}
+.notice-card:active{background:#f5f5fa}
+.notice-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.nd-red{background:var(--red)}.nd-orange{background:var(--orange)}.nd-blue{background:var(--blue)}.nd-green{background:var(--green)}.nd-purple{background:var(--accent)}
+.notice-body{flex:1;min-width:0}
+.notice-title{font-size:14px;font-weight:500;color:var(--text);line-height:1.5}
+.notice-sub{font-size:12px;color:var(--sub);margin-top:2px}
+.event-card{background:var(--card);border-radius:var(--r);padding:14px 16px;margin-bottom:6px;display:flex;align-items:center;gap:12px}
+.event-days{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.event-days-num{font-size:18px;font-weight:700;line-height:1}
+.event-days-lbl{font-size:9px;font-weight:600;opacity:.85}
+.event-days.expired{background:#e5e5ea;color:var(--muted)}
+.event-days.today{background:var(--pink)}
+.event-body{flex:1;min-width:0}
+.event-title{font-size:14px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.event-period{font-size:12px;color:var(--sub);margin-top:2px}
+.empty-small{padding:20px;text-align:center;font-size:13px;color:var(--muted);background:var(--card);border-radius:var(--r)}
+.nav{
+  height:calc(var(--nav) + env(safe-area-inset-bottom,0px));
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  background:rgba(250,250,250,.96);border-top:.5px solid var(--border);
+  display:flex;align-items:flex-start;flex-shrink:0;backdrop-filter:blur(20px);z-index:30;
+}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:10px 0 6px;border:none;background:none;-webkit-tap-highlight-color:transparent;transition:transform .1s}
+.nav-item:active{transform:scale(.88)}
+.nav-icon{font-size:22px;line-height:1}
+.nav-lbl{font-size:10px;font-weight:500;color:var(--muted)}
+.nav-item.active .nav-lbl{color:var(--accent);font-weight:700}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section-anim{animation:fadeInUp .25s ease both}
+.section-anim:nth-child(2){animation-delay:.05s}
+.section-anim:nth-child(3){animation-delay:.1s}
+.section-anim:nth-child(4){animation-delay:.15s}
+</style>
 </head>
 <body>
 <div class="phone">
-
-  <!-- Header -->
   <div class="hdr">
-    <div class="hdr-left">
+    <div>
       <div class="hdr-greeting" id="greeting"></div>
       <div class="hdr-title">ふたりのアプリ 💑</div>
       <div class="hdr-date" id="todayDate"></div>
     </div>
+    <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()">🔄</button>
   </div>
-
-  <!-- Scroll -->
   <div class="scroll" id="scroll"></div>
-
-  <!-- Bottom Nav -->
   <nav class="nav">
-    <button class="nav-item active" id="nav-home" onclick="goTo('home')">
-      <span class="nav-icon">🏠</span><span class="nav-lbl">ホーム</span>
-    </button>
-    <button class="nav-item" id="nav-pay" onclick="goTo('pay')">
-      <span class="nav-icon">💰</span><span class="nav-lbl">支払い</span>
-    </button>
-    <button class="nav-item" id="nav-wants" onclick="goTo('wants')">
-      <span class="nav-icon">📋</span><span class="nav-lbl">やりたい</span>
-    </button>
-    <button class="nav-item" id="nav-stamp" onclick="goTo('stamp')">
-      <span class="nav-icon">🔖</span><span class="nav-lbl">スタンプ</span>
-    </button>
+    <button class="nav-item active" onclick="goTo('home')"><span class="nav-icon">🏠</span><span class="nav-lbl">ホーム</span></button>
+    <button class="nav-item" onclick="goTo('pay')"><span class="nav-icon">💰</span><span class="nav-lbl">支払い</span></button>
+    <button class="nav-item" onclick="goTo('wants')"><span class="nav-icon">📋</span><span class="nav-lbl">やりたい</span></button>
+    <button class="nav-item" onclick="goTo('stamp')"><span class="nav-icon">🔖</span><span class="nav-lbl">スタンプ</span></button>
   </nav>
-
 </div>
-
 <script>
-/* ═══════════════════════════
-   UTILS
-═══════════════════════════ */
-function yen(n)    { return '¥' + Number(n).toLocaleString(); }
-function todayStr(){ return new Date().toISOString().slice(0,10); }
-function fmtDay(s) {
-  if (!s) return '—';
-  const d = new Date(s); if (isNaN(d)) return s;
-  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+function yen(n){return'¥'+Number(n).toLocaleString()}
+function todayStr(){return new Date().toISOString().slice(0,10)}
+function loadPayments(){try{const d=JSON.parse(localStorage.getItem('pay_v1'));return Array.isArray(d)?d:spd()}catch{return spd()}}
+function loadWants(){try{const d=JSON.parse(localStorage.getItem('wants_v1'));return Array.isArray(d)?d:swd()}catch{return swd()}}
+function loadStamp(){try{const d=JSON.parse(localStorage.getItem('stamp_v1'));return(d&&Array.isArray(d.cards))?d:ssd()}catch{return ssd()}}
+function spd(){return[{date:'2026-04-06T14:00',amount:800,who:'A',status:'unpaid'},{date:'2026-04-04T12:00',amount:1000,who:'B',status:'unpaid'}]}
+function swd(){return[{title:'花畑へ行く',registrar:'A',status:'pending',regDate:'2026-03-02',period:'2026/4/1〜4/30'},{title:'動物園',registrar:'B',status:'done',regDate:'2026-03-02',doneDate:'2026-03-15'}]}
+function ssd(){return{cards:[{cells:Array(30).fill(false),stampDates:Array(30).fill(null),completed:false,goal:'毎日の目標',startDate:new Date().toISOString()}]}}
+
+function renderHeader(){
+  const h=new Date().getHours();
+  document.getElementById('greeting').textContent=h<5?'おやすみなさい 🌙':h<12?'おはようございます ☀️':h<17?'こんにちは 🌤':'こんばんは 🌙';
+  const d=new Date(),w=['日','月','火','水','木','金','土'];
+  document.getElementById('todayDate').textContent=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${w[d.getDay()]}）`;
 }
 
-/* ═══════════════════════════
-   LOAD DATA FROM localStorage
-   （各画面と同じキーで共有）
-═══════════════════════════ */
-function loadPayments() {
-  try {
-    const d = JSON.parse(localStorage.getItem('pay_v1'));
-    return Array.isArray(d) ? d : samplePayments();
-  } catch { return samplePayments(); }
-}
-function loadWants() {
-  try {
-    const d = JSON.parse(localStorage.getItem('wants_v1'));
-    return Array.isArray(d) ? d : sampleWants();
-  } catch { return sampleWants(); }
-}
-function loadStamp() {
-  try {
-    const d = JSON.parse(localStorage.getItem('stamp_v1'));
-    return (d && Array.isArray(d.cards)) ? d : sampleStamp();
-  } catch { return sampleStamp(); }
+function doRefresh(){
+  const btn=document.getElementById('refreshBtn');
+  btn.classList.add('spin');
+  setTimeout(()=>btn.classList.remove('spin'),500);
+  renderHeader();render();
 }
 
-/* ─ フォールバック用サンプルデータ ─ */
-function samplePayments() {
-  return [
-    { date:'2026-04-06T14:00', amount:800,  who:'A', status:'unpaid' },
-    { date:'2026-04-05T16:00', amount:1200, who:'A', status:'unpaid' },
-    { date:'2026-04-01T01:00', amount:100,  who:'A', status:'paid'   },
-    { date:'2026-04-04T12:00', amount:1000, who:'B', status:'unpaid' },
-    { date:'2026-03-30T09:00', amount:500,  who:'B', status:'paid'   },
-  ];
-}
-function sampleWants() {
-  return [
-    { title:'花畑へ行く',  registrar:'A', status:'pending', regDate:'2026-03-02', period:'2026/4/1〜4/30'  },
-    { title:'水族館デート', registrar:'B', status:'pending', regDate:'2026-03-02', period:''               },
-    { title:'お化け屋敷',   registrar:'A', status:'pending', regDate:'2026-03-02', period:'2026/4/20〜5/5' },
-    { title:'動物園',       registrar:'B', status:'done',    regDate:'2026-03-02', doneDate:'2026-03-15'   },
-    { title:'映画鑑賞',     registrar:'A', status:'done',    regDate:'2026-02-10', doneDate:'2026-02-20'   },
-  ];
-}
-function sampleStamp() {
-  return { cards: [{ cells: Array(30).fill(false), stampDates: Array(30).fill(null), completed: false, goal:'毎日の目標', startDate: new Date().toISOString() }] };
-}
+function render(){
+  const pays=loadPayments(),wants=loadWants(),stamp=loadStamp();
+  const unA=pays.filter(p=>p.who==='A'&&p.status==='unpaid').reduce((s,p)=>s+p.amount,0);
+  const unB=pays.filter(p=>p.who==='B'&&p.status==='unpaid').reduce((s,p)=>s+p.amount,0);
+  const diff=unB-unA,diffAbs=Math.abs(diff);
+  const diffDesc=diff>0?`相手 (B) が ${yen(diffAbs)} 多く払うべき状態です`:diff<0?`あなた (A) が ${yen(diffAbs)} 多く払うべき状態です`:'お互いの支払いは釣り合っています ✨';
+  const wTotal=wants.length,wDone=wants.filter(w=>w.status==='done').length,wPending=wants.filter(w=>w.status==='pending').length,wPct=wTotal?Math.round(wDone/wTotal*100):0;
+  const lc=stamp.cards[stamp.cards.length-1];
+  const sStamped=lc?lc.cells.filter(Boolean).length:0;
+  const sTodayDone=lc?lc.stampDates.some(d=>d&&d.startsWith(todayStr())):false;
+  const sComp=lc?.completed||false,sPct=Math.round(sStamped/30*100);
+  const notices=buildNotices(pays,wants,lc,sTodayDone,sComp);
+  const today=new Date();today.setHours(0,0,0,0);
+  const upcoming=wants.filter(w=>w.status==='pending'&&w.period).map(w=>{const e=parseEnd(w.period);return e?{...w,e,days:Math.ceil((e-today)/86400000)}:null}).filter(Boolean).sort((a,b)=>a.days-b.days).slice(0,4);
 
-/* ═══════════════════════════
-   HEADER
-═══════════════════════════ */
-function renderHeader() {
-  const h = new Date().getHours();
-  const greeting = h < 5 ? 'おやすみなさい 🌙' : h < 12 ? 'おはようございます ☀️' : h < 17 ? 'こんにちは 🌤' : 'こんばんは 🌙';
-  document.getElementById('greeting').textContent = greeting;
-
-  const d = new Date();
-  const weeks = ['日','月','火','水','木','金','土'];
-  document.getElementById('todayDate').textContent =
-    `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${weeks[d.getDay()]}）`;
-}
-
-/* ═══════════════════════════
-   MAIN RENDER
-═══════════════════════════ */
-function render() {
-  const pays   = loadPayments();
-  const wants  = loadWants();
-  const stamp  = loadStamp();
-
-  /* ─ 支払い集計 ─ */
-  const unA = pays.filter(p => p.who==='A' && p.status==='unpaid').reduce((s,p)=>s+p.amount,0);
-  const unB = pays.filter(p => p.who==='B' && p.status==='unpaid').reduce((s,p)=>s+p.amount,0);
-  const diff = unB - unA;
-  const diffAbs = Math.abs(diff);
-  let diffDesc, diffColor;
-  if (diff > 0) {
-    diffDesc  = `相手 (B) が ${yen(diffAbs)} 多く払うべき状態です`;
-    diffColor = 'var(--green)';
-  } else if (diff < 0) {
-    diffDesc  = `あなた (A) が ${yen(diffAbs)} 多く払うべき状態です`;
-    diffColor = 'var(--red)';
-  } else {
-    diffDesc  = 'お互いの支払いは釣り合っています ✨';
-    diffColor = 'rgba(255,255,255,.9)';
-  }
-
-  /* ─ やりたいこと集計 ─ */
-  const wTotal   = wants.length;
-  const wDone    = wants.filter(w=>w.status==='done').length;
-  const wPending = wants.filter(w=>w.status==='pending').length;
-  const wPct     = wTotal ? Math.round(wDone/wTotal*100) : 0;
-
-  /* ─ スタンプ集計 ─ */
-  const latestCard = stamp.cards[stamp.cards.length-1];
-  const sStamped   = latestCard ? latestCard.cells.filter(Boolean).length : 0;
-  const sGoal      = latestCard?.goal || '目標未設定';
-  const sTodayDone = latestCard
-    ? latestCard.stampDates.some(d=>d&&d.startsWith(todayStr()))
-    : false;
-  const sCompleted = latestCard?.completed || false;
-  const sPct       = Math.round(sStamped/30*100);
-
-  /* ─ お知らせ生成 ─ */
-  const notices = buildNotices(pays, wants, latestCard, sTodayDone, sCompleted);
-
-  /* ─ 期限が近いやりたいこと ─ */
-  const today  = new Date(); today.setHours(0,0,0,0);
-  const upcoming = wants
-    .filter(w => w.status==='pending' && w.period)
-    .map(w => {
-      const end = parseEndDate(w.period);
-      return end ? { ...w, end, days: Math.ceil((end-today)/86400000) } : null;
-    })
-    .filter(Boolean)
-    .sort((a,b) => a.days - b.days)
-    .slice(0, 4);
-
-  /* ─ HTML構築 ─ */
-  const el = document.getElementById('scroll');
-  el.innerHTML = `
-
-    <!-- 支払い差額ヒーロー -->
+  document.getElementById('scroll').innerHTML=`
     <div class="hero-card section-anim">
       <div class="hero-tag">💰 支払い差額サマリー</div>
       <div class="hero-amount">${yen(diffAbs)}</div>
       <div class="hero-desc">${diffDesc}</div>
       <div class="hero-sub-row">
-        <div class="hero-sub-item">
-          <div class="hero-sub-label">自分 (A) 未払い</div>
-          <div class="hero-sub-val">${yen(unA)}</div>
-        </div>
-        <div class="hero-sub-item">
-          <div class="hero-sub-label">相手 (B) 未払い</div>
-          <div class="hero-sub-val">${yen(unB)}</div>
-        </div>
+        <div class="hero-sub-item"><div class="hero-sub-label">自分 (A) 未払い</div><div class="hero-sub-val">${yen(unA)}</div></div>
+        <div class="hero-sub-item"><div class="hero-sub-label">相手 (B) 未払い</div><div class="hero-sub-val">${yen(unB)}</div></div>
       </div>
     </div>
-
-    <!-- ステータスグリッド -->
     <div class="grid2 section-anim">
-      <div class="stat-card">
-        <span class="stat-icon">📋</span>
-        <div class="stat-label">やりたいこと</div>
-        <div class="stat-value">${wPending}<span style="font-size:13px;font-weight:400;color:var(--sub)"> 件</span></div>
-        <div class="stat-sub">実行済み ${wDone} / 全 ${wTotal} 件</div>
-        <div class="stat-bar-wrap">
-          <div class="stat-bar-fill" style="width:${wPct}%;background:linear-gradient(90deg,var(--green),#86efac)"></div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-icon">🔖</span>
-        <div class="stat-label">スタンプカード</div>
-        <div class="stat-value">${sStamped}<span style="font-size:13px;font-weight:400;color:var(--sub)"> / 30</span></div>
-        <div class="stat-sub">${sCompleted ? '✨ コンプリート済み' : sTodayDone ? '✅ 今日は押した' : '⏳ 今日未スタンプ'}</div>
-        <div class="stat-bar-wrap">
-          <div class="stat-bar-fill" style="width:${sPct}%;background:linear-gradient(90deg,var(--pink),#fb923c)"></div>
-        </div>
-      </div>
+      <div class="stat-card"><span class="stat-icon">📋</span><div class="stat-label">やりたいこと</div><div class="stat-value">${wPending}<span style="font-size:13px;font-weight:400;color:var(--sub)"> 件</span></div><div class="stat-sub">実行済み ${wDone} / 全 ${wTotal} 件</div><div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:${wPct}%;background:linear-gradient(90deg,var(--green),#86efac)"></div></div></div>
+      <div class="stat-card"><span class="stat-icon">🔖</span><div class="stat-label">スタンプカード</div><div class="stat-value">${sStamped}<span style="font-size:13px;font-weight:400;color:var(--sub)"> / 30</span></div><div class="stat-sub">${sComp?'✨ コンプリート済み':sTodayDone?'✅ 今日は押した':'⏳ 今日未スタンプ'}</div><div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:${sPct}%;background:linear-gradient(90deg,var(--pink),#fb923c)"></div></div></div>
     </div>
-
-    <!-- お知らせ -->
-    ${notices.length ? `
-      <div class="sec-lbl section-anim">🔔 お知らせ (${notices.length})</div>
-      <div class="section-anim">
-        ${notices.map(n=>`
-          <div class="notice-card" onclick="goTo('${n.screen||'home'}')">
-            <div class="notice-dot ${n.dot}"></div>
-            <div class="notice-body">
-              <div class="notice-title">${n.title}</div>
-              ${n.sub ? `<div class="notice-sub">${n.sub}</div>` : ''}
-            </div>
-          </div>`).join('')}
-      </div>` : ''}
-
-    <!-- 期限が近いやりたいこと -->
+    ${notices.length?`<div class="sec-lbl section-anim">🔔 お知らせ (${notices.length})</div><div class="section-anim">${notices.map(n=>`<div class="notice-card" onclick="goTo('${n.screen||'home'}')"><div class="notice-dot ${n.dot}"></div><div class="notice-body"><div class="notice-title">${n.title}</div>${n.sub?`<div class="notice-sub">${n.sub}</div>`:''}</div></div>`).join('')}</div>`:''}
     <div class="sec-lbl section-anim">📅 期限が近いやりたいこと</div>
-    <div class="section-anim">
-      ${upcoming.length ? upcoming.map(w => {
-        let daysCls = 'event-days';
-        let daysLabel = `あと${w.days}日`;
-        if (w.days < 0)     { daysCls += ' expired'; daysLabel = '終了'; }
-        else if (w.days===0){ daysCls += ' today';   daysLabel = '今日！'; }
-        return `
-          <div class="event-card">
-            <div class="${daysCls}">
-              <div class="event-days-num">${w.days<=0?'—':w.days}</div>
-              <div class="event-days-lbl">${w.days>0?'日後':w.days===0?'今日':'終了'}</div>
-            </div>
-            <div class="event-body">
-              <div class="event-title">${w.title}</div>
-              <div class="event-period">${w.period}</div>
-            </div>
-          </div>`;
-      }).join('') : '<div class="empty-small">期限付きの予定はありません</div>'}
-    </div>
-
-    <div style="height:6px"></div>
-  `;
+    <div class="section-anim">${upcoming.length?upcoming.map(w=>{let c='event-days';if(w.days<0)c+=' expired';else if(w.days===0)c+=' today';return`<div class="event-card"><div class="${c}"><div class="event-days-num">${w.days<=0?'—':w.days}</div><div class="event-days-lbl">${w.days>0?'日後':w.days===0?'今日':'終了'}</div></div><div class="event-body"><div class="event-title">${w.title}</div><div class="event-period">${w.period}</div></div></div>`}).join(''):'<div class="empty-small">期限付きの予定はありません</div>'}</div>
+    <div style="height:6px"></div>`;
 }
 
-/* ═══════════════════════════
-   お知らせ生成
-═══════════════════════════ */
-function buildNotices(pays, wants, latestCard, sTodayDone, sCompleted) {
-  const notices = [];
-  const today   = new Date(); today.setHours(0,0,0,0);
-
-  /* 未払いが多い */
-  const unA = pays.filter(p=>p.who==='A'&&p.status==='unpaid').reduce((s,p)=>s+p.amount,0);
-  const unB = pays.filter(p=>p.who==='B'&&p.status==='unpaid').reduce((s,p)=>s+p.amount,0);
-  if (unA > 0) notices.push({ dot:'nd-red',    title:`あなたの未払いが ${yen(unA)} あります`, sub:'支払い管理から確認できます', screen:'pay' });
-  if (unB > 0) notices.push({ dot:'nd-orange',  title:`相手の未払いが ${yen(unB)} あります`,   sub:'支払い管理から確認できます', screen:'pay' });
-
-  /* スタンプ未押し */
-  if (!sCompleted && !sTodayDone && latestCard) {
-    const remain = 30 - latestCard.cells.filter(Boolean).length;
-    notices.push({ dot:'nd-purple', title:'今日のスタンプがまだ押せます', sub:`残り ${remain} マス`, screen:'stamp' });
-  }
-
-  /* やりたいこと期限3日以内 */
-  wants
-    .filter(w => w.status==='pending' && w.period)
-    .forEach(w => {
-      const end  = parseEndDate(w.period);
-      if (!end) return;
-      const days = Math.ceil((end - today) / 86400000);
-      if (days >= 0 && days <= 3) {
-        notices.push({
-          dot:    days === 0 ? 'nd-red' : 'nd-blue',
-          title:  `「${w.title}」の期限まであと ${days === 0 ? '今日！' : days+'日'}`,
-          sub:    w.period,
-          screen: 'wants'
-        });
-      }
-    });
-
+function buildNotices(pays,wants,lc,sTodayDone,sComp){
+  const notices=[],today=new Date();today.setHours(0,0,0,0);
+  const unA=pays.filter(p=>p.who==='A'&&p.status==='unpaid').reduce((s,p)=>s+p.amount,0);
+  const unB=pays.filter(p=>p.who==='B'&&p.status==='unpaid').reduce((s,p)=>s+p.amount,0);
+  if(unA>0)notices.push({dot:'nd-red',title:`あなたの未払いが ${yen(unA)} あります`,sub:'支払い管理から確認できます',screen:'pay'});
+  if(unB>0)notices.push({dot:'nd-orange',title:`相手の未払いが ${yen(unB)} あります`,sub:'支払い管理から確認できます',screen:'pay'});
+  if(!sComp&&!sTodayDone&&lc){const r=30-lc.cells.filter(Boolean).length;notices.push({dot:'nd-purple',title:'今日のスタンプがまだ押せます',sub:`残り ${r} マス`,screen:'stamp'})}
+  wants.filter(w=>w.status==='pending'&&w.period).forEach(w=>{const e=parseEnd(w.period);if(!e)return;const days=Math.ceil((e-today)/86400000);if(days>=0&&days<=3)notices.push({dot:days===0?'nd-red':'nd-blue',title:`「${w.title}」の期限まであと ${days===0?'今日！':days+'日'}`,sub:w.period,screen:'wants'})});
   return notices;
 }
+function parseEnd(period){if(!period)return null;const m=period.match(/(\d{4}\/\d{1,2}\/\d{1,2})/g);if(!m||m.length<2)return null;const d=new Date(m[1].replace(/\//g,'-'));return isNaN(d)?null:d}
+function goTo(s){const m={pay:'01_payment.html',wants:'02_wants.html',stamp:'03_stamp.html',bingo:'04_bingo.html'};if(m[s])window.location.href=m[s]}
 
-/* ═══════════════════════════
-   UTILS
-═══════════════════════════ */
-function parseEndDate(period) {
-  if (!period) return null;
-  // "YYYY/M/D〜YYYY/M/D" or "YYYY/M/D~YYYY/M/D"
-  const m = period.match(/(\d{4}\/\d{1,2}\/\d{1,2})/g);
-  if (!m || m.length < 2) return null;
-  const d = new Date(m[1].replace(/\//g,'-'));
-  return isNaN(d) ? null : d;
-}
-
-/* ─ nav ─ */
-function goTo(screen) {
-  const map = {
-    pay:   '01_payment.html',
-    wants: '02_wants.html',
-    stamp: '03_stamp.html',
-    bingo: '04_bingo.html',
-  };
-  if (map[screen]) {
-    window.location.href = map[screen];
-  }
-}
-
-/* ═══════════════════════════
-   INIT
-═══════════════════════════ */
-renderHeader();
-render();
-
-// 1分ごとに自動更新
-setInterval(() => { renderHeader(); render(); }, 60000);
+renderHeader();render();
+setInterval(()=>{renderHeader();render()},60000);
 </script>
 </body>
 </html>
