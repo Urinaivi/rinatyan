@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>スタンプカード</title>
-<link rel="icon" type="image/png" href="photo/favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -138,10 +137,12 @@ function init(){
   REWARD_STORE='stamp_reward_v1_'+U.id;
   document.getElementById('hdrUser').textContent=U.icon+' '+U.name;
   document.getElementById('nav').innerHTML=navHTML('stamp');
-  data=loadData();
-  reward=localStorage.getItem(REWARD_STORE)||'互いに好きな報酬を決める 🎁';
-  cardIdx=data.cards.length-1;
-  render();
+  syncOnLoad(['stamp','accounts'],U.id).then(()=>{
+    data=loadData();
+    reward=localStorage.getItem(REWARD_STORE)||'互いに好きな報酬を決める 🎁';
+    cardIdx=data.cards.length-1;
+    render();
+  });
 }
 
 function loadData(){
@@ -150,7 +151,7 @@ function loadData(){
 }
 function createCard(title,goal){return{id:uid(),title,goal,startDate:new Date().toISOString(),cells:Array(30).fill(false),stampDates:Array(30).fill(null),completed:false,completedDate:null}}
 function stampedToday(card){return card.stampDates.some(d=>d&&d.startsWith(todayStr()))}
-function persist(){localStorage.setItem(STORE,JSON.stringify(data))}
+function persist(){localStorage.setItem(STORE,JSON.stringify(data));syncOnSave('stamp',data,U.id);}
 
 function render(){
   const el=document.getElementById('scroll');

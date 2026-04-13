@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>やりたいことリスト</title>
-<link rel="icon" type="image/png" href="photo/favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -99,7 +98,7 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
     <div class="hdr-title">やりたいことリスト</div>
     <div class="hdr-acts">
       <button class="hdr-btn" onclick="openFilter()">⚙️</button>
-      <button class="hdr-btn" onclick="location.href='04_bingo.html'">🎉</button>
+      <button class="hdr-btn" onclick="location.href='04_bingo.html'">⬛</button>
     </div>
   </div>
   <div class="search-wrap">
@@ -190,8 +189,10 @@ function init(){
   U=currentUser();P=getAccount(partnerId());
   applyTheme(U.theme);
   document.getElementById('nav').innerHTML=navHTML('wants');
-  try{const s=JSON.parse(localStorage.getItem(STORE));items=(Array.isArray(s)&&s.length)?s:sampleItems()}catch{items=sampleItems()}
-  autoDelete();applyFilterUI();render();
+  syncOnLoad(['wants','accounts']).then(()=>{
+    try{const s=JSON.parse(localStorage.getItem(STORE));items=(Array.isArray(s)&&s.length)?s:sampleItems()}catch{items=sampleItems()}
+    autoDelete();applyFilterUI();render();
+  });
 }
 
 function sampleItems(){return[
@@ -203,7 +204,7 @@ function sampleItems(){return[
 function accountName(id){return id===U.id?U.name:P.name}
 function accountIcon(id){return id===U.id?U.icon:P.icon}
 
-function persist(){localStorage.setItem(STORE,JSON.stringify(items))}
+function persist(){localStorage.setItem(STORE,JSON.stringify(items));syncOnSave('wants',items);}
 function autoDelete(){const y3=3*365*24*60*60*1000,now=Date.now(),b=items.length;items=items.filter(w=>{if(w.status!=='done'||!w.doneDate)return true;return now-new Date(w.doneDate).getTime()<y3});if(items.length!==b)persist()}
 
 function openM(id){document.getElementById(id).classList.add('open')}

@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>マイページ</title>
-<link rel="icon" type="image/png" href="photo/favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -262,6 +261,7 @@ function saveName() {
   const accs = getAccounts();
   const idx = accs.findIndex(a => a.id === getSession());
   accs[idx].name = val;
+  syncOnSave('accounts',accs);
   saveAccounts(accs);
   closeM('nameModal');
   renderPage();
@@ -289,6 +289,7 @@ function savePw() {
   if (nw !== conf) { err.textContent = 'パスワードが一致しません'; err.classList.add('show'); return; }
 
   accs[idx].password = nw;
+  syncOnSave('accounts',accs);
   saveAccounts(accs);
   ok.classList.add('show');
   setTimeout(() => closeM('pwModal'), 1200);
@@ -316,6 +317,7 @@ function saveTheme() {
   const accs = getAccounts();
   const idx = accs.findIndex(a => a.id === getSession());
   accs[idx].theme = selectedTheme;
+  syncOnSave('accounts',accs);
   saveAccounts(accs);
   applyTheme(selectedTheme);
   closeM('themeModal');
@@ -341,6 +343,7 @@ function saveIcon() {
   const accs = getAccounts();
   const idx = accs.findIndex(a => a.id === getSession());
   accs[idx].icon = selectedIcon;
+  syncOnSave('accounts',accs);
   saveAccounts(accs);
   closeM('iconModal');
   renderPage();

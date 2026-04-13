@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>支払い管理</title>
-<link rel="icon" type="image/png" href="photo/favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -152,7 +151,11 @@ function init(){
   document.getElementById('t-partner').textContent=P.icon+' '+P.name;
   // データ
   try{const s=JSON.parse(localStorage.getItem(STORE));payments=(Array.isArray(s)&&s.length)?s:[];}catch{payments=[]}
-  autoDelete();render();
+  // GAS同期してからレンダリング
+  syncOnLoad(["payments","accounts"]).then(()=>{
+    try{const s=JSON.parse(localStorage.getItem(STORE));payments=(Array.isArray(s)&&s.length)?s:[];}catch{payments=[]}
+    autoDelete();render();
+  });
 }
 
 function autoDelete(){
@@ -160,7 +163,7 @@ function autoDelete(){
   payments=payments.filter(p=>now-new Date(p.date).getTime()<lim);
   if(payments.length!==b)persist();
 }
-function persist(){localStorage.setItem(STORE,JSON.stringify(payments))}
+function persist(){localStorage.setItem(STORE,JSON.stringify(payments));syncOnSave('payments',payments);}
 
 function myId(){return U.id}
 function ptId(){return P.id}

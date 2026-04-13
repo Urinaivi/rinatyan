@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>ビンゴカード</title>
-<link rel="icon" type="image/png" href="photo/favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -141,14 +140,16 @@ function init(){
   U=currentUser();P=getAccount(partnerId());
   applyTheme(U.theme);
   document.getElementById('nav').innerHTML=navHTML('wants');
-  bingoData=loadBingo();wantsItems=loadWants();
-  reward=localStorage.getItem(REWARD_STORE)||'好きなレストランへのディナー 🍽️';
-  ensureSeasons();seasonIdx=currentSeasonIdx();render();
+  syncOnLoad(['bingo','wants','accounts']).then(()=>{
+    bingoData=loadBingo();wantsItems=loadWants();
+    reward=localStorage.getItem(REWARD_STORE)||'好きなレストランへのディナー 🍽️';
+    ensureSeasons();seasonIdx=currentSeasonIdx();render();
+  });
 }
 
 function loadBingo(){try{const d=JSON.parse(localStorage.getItem(BINGO_STORE));if(d&&Array.isArray(d.seasons))return d}catch{}return{seasons:[]}}
 function loadWants(){try{const d=JSON.parse(localStorage.getItem(WANTS_STORE));if(Array.isArray(d))return d}catch{}return[]}
-function persist(){localStorage.setItem(BINGO_STORE,JSON.stringify(bingoData))}
+function persist(){localStorage.setItem(BINGO_STORE,JSON.stringify(bingoData));syncOnSave('bingo',bingoData);}
 function accountName(id){return id===U.id?U.name:P.name}
 function accountIcon(id){return id===U.id?U.icon:P.icon}
 
