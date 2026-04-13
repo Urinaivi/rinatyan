@@ -7,8 +7,8 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbzcrClFMEY1FeQu1IHALsIx
 
 /* ── アカウント定義（初期値） ── */
 const DEFAULT_ACCOUNTS = [
-  { id:'A', name:'りな',    email:'Urinaivi@gmail.com',   password:'utigatukutta', icon:'🌸', theme:'#7c7aff' },
-  { id:'B', name:'しゅうと', email:'shumon2423@iCloud.com', password:'rinalove',    icon:'🌊', theme:'#34c759' },
+  { id:'A', name:'りな',    email:'Urinaivi@gmail.com',   password:'utigatukutta', icon:'🌸', theme:'#ffafe4' },
+  { id:'B', name:'しゅうと', email:'shumon2423@iCloud.com', password:'rinalove',    icon:'🌊', theme:'#a4ceff' },
 ];
 
 /* ── ストレージキー ── */
@@ -39,7 +39,7 @@ function partnerId()    { const id=getSession();return id==='A'?'B':'A'; }
    テーマ
 ──────────────────────────────────────────────────────────── */
 function applyTheme(color) {
-  if(!color){const u=currentUser();color=u?u.theme:'#7c7aff';}
+  if(!color){const u=currentUser();color=u?u.theme:'#fdc4ff';}
   document.documentElement.style.setProperty('--accent',color);
 }
 
