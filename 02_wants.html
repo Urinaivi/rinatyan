@@ -119,7 +119,8 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
       <div class="sh-hdr"><span class="sh-title">やりたいことを追加</span><button class="x-btn" onclick="closeM('addModal')">✕</button></div>
       <div class="f-card">
         <div class="f-row"><span class="f-lbl">タイトル</span><input class="f-inp" type="text" id="f-title" placeholder="例：花畑へ行く"/></div>
-        <div class="f-row"><span class="f-lbl">イベント期間</span><input class="f-inp" type="text" id="f-period" placeholder="例：2026/4/1〜4/30"/></div>
+        <div class="f-row"><span class="f-lbl">開始日</span><input class="f-inp" type="date" id="f-period-start"/></div>
+        <div class="f-row"><span class="f-lbl">終了日</span><input class="f-inp" type="date" id="f-period-end"/></div>
         <div class="f-row"><span class="f-lbl">URL</span><input class="f-inp" type="url" id="f-url" placeholder="https://..."/></div>
         <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">メモ</span><textarea class="f-inp left" id="f-memo" rows="2" placeholder="任意"></textarea></div>
       </div>
@@ -151,7 +152,8 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
       <div class="sh-hdr"><span class="sh-title">やりたいことを編集</span><button class="x-btn" onclick="closeM('editModal')">✕</button></div>
       <div class="f-card">
         <div class="f-row"><span class="f-lbl">タイトル</span><input class="f-inp" type="text" id="e-title"/></div>
-        <div class="f-row"><span class="f-lbl">イベント期間</span><input class="f-inp" type="text" id="e-period" placeholder="例：2026/4/1〜4/30"/></div>
+        <div class="f-row"><span class="f-lbl">開始日</span><input class="f-inp" type="date" id="e-period-start"/></div>
+        <div class="f-row"><span class="f-lbl">終了日</span><input class="f-inp" type="date" id="e-period-end"/></div>
         <div class="f-row"><span class="f-lbl">URL</span><input class="f-inp" type="url" id="e-url" placeholder="https://..."/></div>
         <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">メモ</span><textarea class="f-inp left" id="e-memo" rows="2"></textarea></div>
         <div class="f-row" id="e-doneDateRow" style="display:none"><span class="f-lbl">実行日</span><input class="f-inp" type="date" id="e-donedate"/></div>
@@ -180,6 +182,24 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function todayStr(){return new Date().toISOString().slice(0,10)}
 function fmtDay(s){if(!s)return'—';const d=new Date(s);if(isNaN(d))return s;return`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`}
+
+function fmtYmd(s){if(!s)return'';const d=new Date(s);if(isNaN(d))return'';return`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`}
+function periodToRange(period){
+  if(!period)return{start:'',end:''};
+  const m=String(period).match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/g);
+  if(!m||m.length<2)return{start:'',end:''};
+  const norm=v=>{
+    const p=v.split('/');
+    return `${p[0]}-${String(p[1]).padStart(2,'0')}-${String(p[2]).padStart(2,'0')}`;
+  };
+  return{start:norm(m[0]),end:norm(m[1])};
+}
+function buildPeriod(start,end){
+  if(!start&&!end)return'';
+  if(!start||!end){alert('イベント期間は開始日と終了日を両方選択してください');return null}
+  if(start>end){alert('イベント期間の終了日は開始日以降にしてください');return null}
+  return `${fmtYmd(start)}〜${fmtYmd(end)}`;
+}
 
 const STORE='wants_v1';
 let items,U,P;
@@ -242,7 +262,8 @@ function drawPie(id,data,colors){
 /* ADD — 登録者はログインユーザー自動設定 */
 function openAdd(){
   document.getElementById('f-title').value='';
-  document.getElementById('f-period').value='';
+   document.getElementById('f-period-start').value='';
+  document.getElementById('f-period-end').value='';
   document.getElementById('f-url').value='';
   document.getElementById('f-memo').value='';
   document.getElementById('f-donedate').value=todayStr();
@@ -258,9 +279,14 @@ function setAddStatus(s){
 function submitAdd(){
   const title=document.getElementById('f-title').value.trim();
   if(!title){alert('タイトルを入力してください');return}
+  const period=buildPeriod(
+    document.getElementById('f-period-start').value,
+    document.getElementById('f-period-end').value
+  );
+  if(period===null)return;
   items.push({
     id:uid(),title,regDate:todayStr(),
-    period:document.getElementById('f-period').value.trim(),
+    period,
     url:document.getElementById('f-url').value.trim(),
     memo:document.getElementById('f-memo').value.trim(),
     registrar:U.id, // ← ログインユーザーを自動設定
@@ -286,8 +312,10 @@ function openDetail(id){
 /* EDIT */
 function openEdit(){
   const w=items.find(x=>x.id===editingId);if(!w)return;
+  const range=periodToRange(w.period);
   document.getElementById('e-title').value=w.title||'';
-  document.getElementById('e-period').value=w.period||'';
+  document.getElementById('e-period-start').value=range.start;
+  document.getElementById('e-period-end').value=range.end;
   document.getElementById('e-url').value=w.url||'';
   document.getElementById('e-memo').value=w.memo||'';
   document.getElementById('e-donedate').value=w.doneDate||todayStr();
@@ -297,8 +325,13 @@ function openEdit(){
 function submitEdit(){
   const title=document.getElementById('e-title').value.trim();
   if(!title){alert('タイトルを入力してください');return}
+  const period=buildPeriod(
+    document.getElementById('e-period-start').value,
+    document.getElementById('e-period-end').value
+  );
+  if(period===null)return;
   const w=items.find(x=>x.id===editingId);if(!w)return;
-  w.title=title;w.period=document.getElementById('e-period').value.trim();
+  w.title=title;w.period=period;
   w.url=document.getElementById('e-url').value.trim();w.memo=document.getElementById('e-memo').value.trim();
   if(w.status==='done')w.doneDate=document.getElementById('e-donedate').value||w.doneDate;
   persist();closeM('editModal');render();
