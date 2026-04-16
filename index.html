@@ -81,7 +81,7 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
     <div>
       <div class="hdr-greeting" id="greeting"></div>
       <div class="hdr-title">Risyu 💗</div>
-      <small>varsion.0.5</small>
+      <small>varsion.0.6</small>
       <div class="hdr-date" id="todayDate"></div>
     </div>
     <div class="hdr-right">
@@ -100,7 +100,7 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
 function yen(n){return'¥'+Number(n).toLocaleString()}
 function todayStr(){return new Date().toISOString().slice(0,10)}
 function loadPayments(){try{const d=JSON.parse(localStorage.getItem('pay_v1'));return Array.isArray(d)?d:[]}catch{return[]}}
-function loadWants(){try{const d=JSON.parse(localStorage.getItem('wants_v1'));return Array.isArray(d)?d:[]}catch{return[]}}
+function loadWants(){try{const d=JSON.parse(localStorage.getItem('wants_v2')||localStorage.getItem('wants_v1'));return Array.isArray(d)?d:[]}catch{return[]}}
 function loadStamp(){
   const u=currentUser();
   const key='stamp_v1_'+u.id;

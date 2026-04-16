@@ -159,7 +159,7 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
 
 <script src="auth.js"></script>
 <script>
-const BINGO_STORE='bingo_v1',WANTS_STORE='wants_v1',REWARD_STORE='bingo_reward_by_count_v1';
+const BINGO_STORE='bingo_v1',WANTS_STORE='wants_v2',REWARD_STORE='bingo_reward_by_count_v1';
 const SEASON_DEFS=[{key:'spring',emoji:'🌸',label:'春',start:'03-01',end:'05-31'},{key:'summer',emoji:'🌻',label:'夏',start:'06-01',end:'08-31'},{key:'autumn',emoji:'🍂',label:'秋',start:'09-01',end:'11-30'},{key:'winter',emoji:'❄️',label:'冬',start:'12-01',end:'02-28'}];
 const BINGO_LINES=[[0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24],[0,5,10,15,20],[1,6,11,16,21],[2,7,12,17,22],[3,8,13,18,23],[4,9,14,19,24],[0,6,12,18,24],[4,8,12,16,20]];
 let bingoData,wantsItems,rewardMap,seasonIdx=0,editMode=false,pickerCellIdx=-1,U,P;
@@ -178,7 +178,7 @@ function init(){
 }
 
 function loadBingo(){try{const d=JSON.parse(localStorage.getItem(BINGO_STORE));if(d&&Array.isArray(d.seasons))return d}catch{}return{seasons:[]}}
-function loadWants(){try{const d=JSON.parse(localStorage.getItem(WANTS_STORE));if(Array.isArray(d))return d}catch{}return[]}
+function loadWants(){try{const d=JSON.parse(localStorage.getItem(WANTS_STORE)||localStorage.getItem('wants_v1'));if(Array.isArray(d))return d}catch{}return[]}
 function defaultRewardMap(){const map={};for(let i=1;i<=12;i++)map[i]=`${i}ビンゴ達成のごほうびを設定してください 🎁`;return map}
 function loadRewardMap(){try{const d=JSON.parse(localStorage.getItem(REWARD_STORE));if(d&&typeof d==='object'){return{...defaultRewardMap(),...d}}}catch{}return defaultRewardMap()}
 function persist(){localStorage.setItem(BINGO_STORE,JSON.stringify(bingoData));syncOnSave('bingo',bingoData);}

@@ -189,7 +189,7 @@ async function syncOnLoad(targets=[],userId=''){
     }
     else if(t==='wants'){
       if(isSyncPending('wants')){
-        const local=JSON.parse(localStorage.getItem('wants_v1')||'[]');
+        const local=JSON.parse(localStorage.getItem('wants_v2')||localStorage.getItem('wants_v1')||'[]');
         if(Array.isArray(local)&&local.length){
           const ok=await saveWantsRemote(local);
           if(ok)setSyncPending('wants',false);
@@ -197,7 +197,7 @@ async function syncOnLoad(targets=[],userId=''){
         }
       }
       const d=await loadWantsRemote();
-      if(d)localStorage.setItem('wants_v1',JSON.stringify(d));
+      if(d)localStorage.setItem('wants_v2',JSON.stringify(d));
     }
     else if(t==='stamp'&&userId){
       const type='stamp_'+userId;
