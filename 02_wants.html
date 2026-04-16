@@ -90,10 +90,6 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
 .filter-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--border)}
 .filter-row:last-child{border-bottom:none}
 .filter-lbl{font-size:14px;color:var(--text)}
-#fil-tag-row{justify-content:space-between;align-items:center}
-#fil-tag-row .filter-lbl{margin-top:0}
-#fil-tag-row .plus-ctl{margin-left:auto;max-width:260px;flex:0 1 auto}
-#fil-tag-row .plus-list{max-width:220px;width:100%}
 .plus-ctl{margin-left:auto;display:flex;align-items:center;gap:8px;flex:1;min-width:0}
 .plus-list{display:flex;flex-direction:column;gap:8px;flex:1}
 .plus-row{display:flex;align-items:center;gap:8px}
@@ -111,6 +107,27 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
 .meter-row span{font-size:12px;color:var(--sub);min-width:40px}
 .meter-row input{flex:1}
 .preview-img{width:100%;max-width:160px;border-radius:10px;border:1px solid #ececf4;display:none;margin-left:auto}
+
+/* ── フィルタータグ選択チップ ── */
+.fil-tag-chips-wrap{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:13px 16px;border-bottom:.5px solid var(--border)}
+.fil-tag-chips-wrap:last-child{border-bottom:none}
+.fil-tag-chips-header{display:flex;align-items:center;justify-content:space-between;width:100%}
+.fil-tag-chips-row{display:flex;flex-wrap:wrap;gap:6px;min-height:0}
+.fil-tag-chip-sel{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:4px 4px 4px 10px;border-radius:999px;background:#eef1ff;color:var(--accent);font-weight:600}
+.fil-tag-chip-sel button{border:none;background:rgba(124,122,255,.15);color:var(--accent);cursor:pointer;font-size:12px;line-height:1;padding:0;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.fil-tag-chip-sel button:active{background:rgba(124,122,255,.3)}
+
+/* ── タグピッカーシート ── */
+.tag-pick-overlay{position:absolute;inset:0;background:rgba(0,0,0,.42);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .22s}
+.tag-pick-overlay.open{opacity:1;pointer-events:all}
+.tag-pick-sheet{width:100%;background:var(--bg);border-radius:24px 24px 0 0;transform:translateY(100%);max-height:55%;overflow-y:auto;transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.tag-pick-overlay.open .tag-pick-sheet{transform:translateY(0)}
+.tag-pick-item{padding:13px 20px;border-bottom:.5px solid var(--border);font-size:15px;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .12s;-webkit-tap-highlight-color:transparent}
+.tag-pick-item:last-child{border-bottom:none}
+.tag-pick-item:active{background:#f5f5fa}
+.tag-pick-item.already{color:var(--muted);pointer-events:none}
+.tag-pick-item.already .tag-pick-check{color:var(--accent);font-size:13px}
+.tag-pick-empty{padding:24px;text-align:center;font-size:14px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -132,7 +149,7 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
   <button class="fab" onclick="openAdd()">＋</button>
   <nav class="nav" id="nav"></nav>
 
-  <!-- 追加モーダル（登録者は自動設定・表示のみ） -->
+  <!-- 追加モーダル -->
   <div class="overlay" id="addModal" onclick="bgClose(event,'addModal')">
     <div class="sheet">
       <div class="sh-handle"></div>
@@ -191,6 +208,7 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
     </div>
   </div>
 
+  <!-- フィルターモーダル -->
   <div class="overlay" id="filterModal" onclick="bgClose(event,'filterModal')">
     <div class="sheet">
       <div class="sh-handle"></div>
@@ -199,10 +217,26 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
         <div class="filter-row"><span class="filter-lbl">ステータス</span><div class="tgl-g"><button class="tgl" id="fil-all" onclick="setFilter('all')">全て</button><button class="tgl" id="fil-pending" onclick="setFilter('pending')">未実行</button><button class="tgl" id="fil-done" onclick="setFilter('done')">実行済み</button></div></div>
         <div class="filter-row"><span class="filter-lbl">マップ</span><div class="tgl-g"><button class="tgl" id="fil-map-all" onclick="setMapFilter('all')">全て</button><button class="tgl" id="fil-map-has" onclick="setMapFilter('has')">あり</button><button class="tgl" id="fil-map-none" onclick="setMapFilter('none')">なし</button></div></div>
         <div class="filter-row" id="fil-reg-row"><span class="filter-lbl">登録者</span><div class="tgl-g" id="fil-reg-btns"></div></div>
-        <div class="filter-row" id="fil-tag-row" style="padding-top:14px"><span class="filter-lbl">タグ</span><div class="plus-ctl"><div class="plus-list" id="fil-tag-list"></div><button class="mini-plus" type="button" onclick="addTagInput('fil-tag-list')">＋</button></div></div>
+        <!-- タグ絞り込み：入力欄なし、ピッカーから選択 -->
+        <div class="fil-tag-chips-wrap">
+          <div class="fil-tag-chips-header">
+            <span class="filter-lbl">タグ</span>
+            <button class="mini-plus" type="button" onclick="openTagPicker()">＋</button>
+          </div>
+          <div id="fil-tag-chips" class="fil-tag-chips-row"></div>
+        </div>
         <div class="filter-row"><span class="filter-lbl">並び替え</span><div class="tgl-g"><button class="tgl" id="sort-reg" onclick="setSort('reg')">登録日</button><button class="tgl" id="sort-done" onclick="setSort('done')">実行日</button></div></div>
       </div>
       <button class="ok-btn" onclick="closeM('filterModal');render()">適用する</button>
+    </div>
+  </div>
+
+  <!-- タグピッカーシート（フィルター用） -->
+  <div class="tag-pick-overlay" id="tagPickOverlay" onclick="if(event.target===this)closeTagPicker()">
+    <div class="tag-pick-sheet">
+      <div class="sh-handle"></div>
+      <div class="sh-hdr"><span class="sh-title">タグを選択</span><button class="x-btn" onclick="closeTagPicker()">✕</button></div>
+      <div id="tagPickList"></div>
     </div>
   </div>
 </div>
@@ -302,7 +336,6 @@ function formatDateTime(s){
 
 function render(){
   const el=document.getElementById('scroll');
-  filterTags = collectPlusValues('fil-tag-list');
   const q=(document.getElementById('searchInput')?.value||'').toLowerCase();
   let list=items.filter(w=>{
     const target=[w.title,w.memo,(w.tags||[]).join(' '),(w.urls||[]).join(' '),w.mapUrl||''].join(' ').toLowerCase();
@@ -521,7 +554,11 @@ function submitEdit(){
   persist();closeM('editModal');render();
 }
 
+/* ════════════════════════════
+   フィルター関連
+════════════════════════════ */
 function openFilter(){applyFilterUI();openM('filterModal')}
+
 function applyFilterUI(){
   const fs=filterStatus,fr=filterReg,sk=sortKey,fm=filterMap;
   document.getElementById('fil-all').className='tgl '+(fs==='all'?'tgl-accent':'tgl-off');
@@ -537,16 +574,63 @@ function applyFilterUI(){
     <button class="tgl ${fr===U.id?'tgl-accent':'tgl-off'}" onclick="setRegFilter('${U.id}')">${iconHTML(U.icon,14)} ${U.name}</button>
     <button class="tgl ${fr===P.id?'tgl-accent':'tgl-off'}" onclick="setRegFilter('${P.id}')">${iconHTML(P.icon,14)} ${P.name}</button>`;
 
-  clearPlusList('fil-tag-list');
-  if(filterTags.length){
-    filterTags.forEach(t=>addTagInput('fil-tag-list',t));
-  } else {
-    addTagInput('fil-tag-list');
-  }
+  renderFilterTagChips();
 
   document.getElementById('sort-reg').className='tgl '+(sk==='reg'?'tgl-accent':'tgl-off');
   document.getElementById('sort-done').className='tgl '+(sk==='done'?'tgl-accent':'tgl-off');
 }
+
+/* タグチップを描画（フィルターモーダル内） */
+function renderFilterTagChips(){
+  const container=document.getElementById('fil-tag-chips');
+  if(!container)return;
+  if(filterTags.length===0){
+    container.innerHTML='';
+    return;
+  }
+  container.innerHTML=filterTags.map((t,i)=>`
+    <span class="fil-tag-chip-sel">
+      ${esc(t)}
+      <button type="button" onclick="removeFilterTag(${i})" title="削除">✕</button>
+    </span>`).join('');
+}
+
+function removeFilterTag(idx){
+  filterTags.splice(idx,1);
+  renderFilterTagChips();
+}
+
+/* タグピッカーを開く */
+function openTagPicker(){
+  const allTags=tagCandidates();
+  const list=document.getElementById('tagPickList');
+  if(allTags.length===0){
+    list.innerHTML='<div class="tag-pick-empty">登録されているタグがありません</div>';
+  }else{
+    list.innerHTML=allTags.map(t=>{
+      const already=filterTags.includes(t);
+      return `<div class="tag-pick-item${already?' already':''}" onclick="${already?'':'addFilterTag(\''+t.replace(/'/g,"\\'")+'\')'}" >
+        <span>${esc(t)}</span>
+        ${already?'<span class="tag-pick-check">✓ 選択中</span>':''}
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('tagPickOverlay').classList.add('open');
+}
+
+function closeTagPicker(){
+  document.getElementById('tagPickOverlay').classList.remove('open');
+}
+
+function addFilterTag(tag){
+  if(!filterTags.includes(tag)){
+    filterTags.push(tag);
+    renderFilterTagChips();
+  }
+  // ピッカーの表示を更新（選択済みをグレーに）
+  openTagPicker();
+}
+
 function setFilter(v){filterStatus=v;applyFilterUI()}
 function setMapFilter(v){filterMap=v;applyFilterUI()}
 function setRegFilter(v){filterReg=v;applyFilterUI()}
