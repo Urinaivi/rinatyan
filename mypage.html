@@ -66,8 +66,18 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
 .color-input{width:100px;height:40px;border:none;background:transparent;cursor:pointer}
 .upload-input{display:none}
 .upload-btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border:none;border-radius:10px;background:#e4e4e9;color:var(--text);font-size:12px;font-weight:700;cursor:pointer}
-.icon-preview{font-size:12px;color:var(--sub);margin-top:8px;word-break:break-all}
-.profile-icon-img{width:72px;height:72px;border-radius:50%;object-fit:cover;display:block}
+.icon-preview{font-size:12px;color:var(--sub);margin-top:8px;word-break:break-all}  .crop-wrap{display:none;padding:16px 16px 0}
+  .crop-canvas-wrap{position:relative;width:100%;max-width:320px;margin:0 auto}
+  #iconCropCanvas{width:100%;aspect-ratio:1 / 1;border-radius:20px;background:#f8f8fc;touch-action:none;cursor:grab;border:1px solid rgba(0,0,0,.08)}
+  #iconCropCanvas.dragging{cursor:grabbing}
+  .crop-hint{font-size:12px;color:var(--sub);text-align:center;margin-top:8px}
+  .crop-controls{display:flex;align-items:center;gap:10px;margin-top:12px}
+  .crop-controls label{flex:1;font-size:13px;color:var(--text)}
+  .crop-controls input[type=range]{width:100%}
+  .crop-reset-btn{padding:10px 14px;border:none;border-radius:12px;background:#eef0ff;color:var(--text);font-size:12px;cursor:pointer}
+  .crop-preview{display:flex;align-items:center;gap:12px;margin-top:12px}
+  .crop-preview-label{font-size:12px;color:var(--sub)}
+  .crop-preview img{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#fff;border:1px solid var(--border)}.profile-icon-img{width:72px;height:72px;border-radius:50%;object-fit:cover;display:block}
 .setting-icon-img{width:20px;height:20px;border-radius:50%;object-fit:cover;display:block}
 
 /* ─ Nav ─ */
@@ -169,6 +179,20 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
         </div>
         <div class="icon-preview" id="iconUploadName">未選択</div>
       </div>
+      <div class="crop-wrap" id="iconCropPanel">
+        <div class="crop-canvas-wrap">
+          <canvas id="iconCropCanvas" width="300" height="300"></canvas>
+          <div class="crop-hint">ドラッグで位置を調整し、拡大縮小で切り抜き範囲を調整できます</div>
+        </div>
+        <div class="crop-controls">
+          <label>拡大縮小<input id="cropScaleInput" type="range" min="1" max="3" step="0.01" value="1" onchange="setCropScale(this.value)" oninput="setCropScale(this.value)"/></label>
+          <button class="crop-reset-btn" type="button" onclick="resetCrop()">リセット</button>
+        </div>
+        <div class="crop-preview">
+          <div class="crop-preview-label">切り取りプレビュー</div>
+          <img id="cropPreviewImg" alt="preview"/>
+        </div>
+      </div>
       <div class="icon-grid" id="iconGrid"></div>
       <button class="ok-btn" onclick="saveIcon()">適用する</button>
     </div>
@@ -196,6 +220,7 @@ const ICONS = ['🌸','🩷','🌷','🐼','🦊','🌙','⭐','🌈','🐹','�
 
 let selectedTheme = null;
 let selectedIcon  = null;
+let imageCropState = null;
 
 function init() {
   if (!requireLogin()) return;
@@ -357,10 +382,12 @@ function saveTheme() {
 /* ── アイコン ── */
 function openIconModal() {
   selectedIcon = currentUser().icon;
+  imageCropState = null;
   const input = document.getElementById('iconUploadInput');
   input.value = '';
   document.getElementById('iconUploadName').textContent = isImageIcon(selectedIcon) ? '現在: カスタム画像' : '未選択';
   renderIconGrid();
+  renderCropPanel();
   openM('iconModal');
 }
 function renderIconGrid() {
@@ -370,8 +397,10 @@ function renderIconGrid() {
 }
 function selectIcon(icon) {
   selectedIcon = icon;
+  imageCropState = null;
   document.getElementById('iconUploadName').textContent = '未選択';
   renderIconGrid();
+  renderCropPanel();
 }
 function onIconUpload(e) {
   const file = e.target.files && e.target.files[0];
@@ -383,13 +412,130 @@ function onIconUpload(e) {
   }
   const reader = new FileReader();
   reader.onload = () => {
-    selectedIcon = String(reader.result || '');
+    const src = String(reader.result || '');
+    selectedIcon = src;
     document.getElementById('iconUploadName').textContent = `選択中: ${file.name}`;
+    initCropState(file, src);
     renderIconGrid();
   };
   reader.readAsDataURL(file);
 }
+function renderCropPanel() {
+  const panel = document.getElementById('iconCropPanel');
+  if (!imageCropState || !imageCropState.img) {
+    panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = 'block';
+  drawCropCanvas();
+}
+function initCropState(file, src) {
+  const img = new Image();
+  img.onload = () => {
+    const size = 300;
+    const fit = Math.max(size / img.width, size / img.height);
+    imageCropState = {
+      img,
+      fileName: file.name,
+      size,
+      minScale: fit,
+      maxScale: fit * 3,
+      scale: fit,
+      x: (size - img.width * fit) / 2,
+      y: (size - img.height * fit) / 2,
+      dragging: false,
+      lastPointerX: 0,
+      lastPointerY: 0,
+    };
+    const slider = document.getElementById('cropScaleInput');
+    slider.min = imageCropState.minScale.toFixed(2);
+    slider.max = imageCropState.maxScale.toFixed(2);
+    slider.value = imageCropState.scale.toFixed(2);
+    renderCropPanel();
+    attachCropEvents();
+  };
+  img.src = src;
+}
+function attachCropEvents() {
+  const canvas = document.getElementById('iconCropCanvas');
+  if (!canvas) return;
+  canvas.onpointerdown = (event) => {
+    if (!imageCropState) return;
+    canvas.setPointerCapture(event.pointerId);
+    imageCropState.dragging = true;
+    imageCropState.lastPointerX = event.clientX;
+    imageCropState.lastPointerY = event.clientY;
+    canvas.classList.add('dragging');
+  };
+  canvas.onpointermove = (event) => {
+    if (!imageCropState || !imageCropState.dragging) return;
+    const dx = event.clientX - imageCropState.lastPointerX;
+    const dy = event.clientY - imageCropState.lastPointerY;
+    imageCropState.lastPointerX = event.clientX;
+    imageCropState.lastPointerY = event.clientY;
+    imageCropState.x += dx;
+    imageCropState.y += dy;
+    drawCropCanvas();
+  };
+  canvas.onpointerup = canvas.onpointercancel = (event) => {
+    if (!imageCropState) return;
+    imageCropState.dragging = false;
+    canvas.releasePointerCapture(event.pointerId);
+    canvas.classList.remove('dragging');
+  };
+}
+function setCropScale(value) {
+  if (!imageCropState) return;
+  const prevScale = imageCropState.scale;
+  imageCropState.scale = Number(value);
+  const centerX = imageCropState.size / 2 - imageCropState.x;
+  const centerY = imageCropState.size / 2 - imageCropState.y;
+  const ratio = imageCropState.scale / prevScale;
+  imageCropState.x = imageCropState.size / 2 - centerX * ratio;
+  imageCropState.y = imageCropState.size / 2 - centerY * ratio;
+  drawCropCanvas();
+}
+function resetCrop() {
+  if (!imageCropState) return;
+  const {img, size, minScale} = imageCropState;
+  imageCropState.scale = minScale;
+  imageCropState.x = (size - img.width * minScale) / 2;
+  imageCropState.y = (size - img.height * minScale) / 2;
+  const slider = document.getElementById('cropScaleInput');
+  slider.value = minScale.toFixed(2);
+  drawCropCanvas();
+}
+function drawCropCanvas() {
+  if (!imageCropState) return;
+  const canvas = document.getElementById('iconCropCanvas');
+  const ctx = canvas.getContext('2d');
+  const {img, size, x, y, scale} = imageCropState;
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, size, size);
+  ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+  ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(1, 1, size - 2, size - 2);
+  document.getElementById('cropPreviewImg').src = canvas.toDataURL('image/png');
+}
+function getCroppedDataUrl() {
+  if (!imageCropState) return selectedIcon;
+  const {img, size, x, y, scale} = imageCropState;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, size, size);
+  ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+  return canvas.toDataURL('image/png');
+}
 function saveIcon() {
+  if (imageCropState) {
+    selectedIcon = getCroppedDataUrl();
+    imageCropState = null;
+  }
   const accs = getAccounts();
   const idx = accs.findIndex(a => a.id === getSession());
   accs[idx].icon = selectedIcon;
