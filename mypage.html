@@ -214,9 +214,9 @@ const THEMES = [
   { color:'#cca68f', name:'ブラウン' },
 ];
 
-const ICONS = ['🌸','🩷','🌷','🐼','🦊','🌙','⭐','🌈','🐹','🩷',
-               '🐶','🐱','🐰','🦄','🐻','🐣','✨','🌼','🔥','💎',
-               '🌻','🫧','🍰','🐻‍❄️','🤍','🧸','☁️','🎧'];
+const ICONS = ['🌸','🩷','🌷','🌙','⭐','🌈',
+               '🐶','🐱','🐰','🦄','🐣','✨','🌼',
+               '🌻','🫧','🍰','🐻‍❄️','🤍','☁️','🎧'];
 
 let selectedTheme = null;
 let selectedIcon  = null;
@@ -389,6 +389,9 @@ function openIconModal() {
   renderIconGrid();
   renderCropPanel();
   openM('iconModal');
+}
+function isImageIcon(icon) {
+  return typeof icon === 'string' && icon.startsWith('data:image/');
 }
 function renderIconGrid() {
   document.getElementById('iconGrid').innerHTML = ICONS.map(ic => `
