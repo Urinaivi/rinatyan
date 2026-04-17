@@ -166,8 +166,8 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
         <div class="f-row hidden" id="f-period-row"><span class="f-lbl">イベント期間</span><div class="period-ctl"><input class="plus-input" type="date" id="f-period-start"/><input class="plus-input" type="date" id="f-period-end"/></div><button class="mini-plus" onclick="toggleAddPeriod()" type="button">−</button></div>
         <div class="f-row"><span class="f-lbl">URL</span><div class="plus-list" id="f-url-list"></div></div>
         <div class="f-row"><span class="f-lbl">マップ</span><input class="f-inp" type="url" id="f-map" placeholder="GoogleMapなど"/></div>
-        <div class="f-row"><span class="f-lbl">画像URL</span><input class="f-inp" type="url" id="f-image" placeholder="https://..." oninput="previewImage('f-image','f-image-preview')"/></div>
-        <div class="f-row"><span class="f-lbl">画像プレビュー</span><img id="f-image-preview" class="preview-img" alt="preview"/></div>
+        <div class="f-row"><span class="f-lbl">画像</span><input class="f-inp" type="file" id="f-image" accept="image/*" onchange="previewFile('f-image','f-image-preview')"/></div>
+        <div class="f-row" id="f-image-preview-row" style="display:none"><span class="f-lbl">画像プレビュー</span><img id="f-image-preview" class="preview-img" alt="preview"/><button class="mini-del" onclick="clearImage('f-image','f-image-preview')" style="margin-left:8px;">×</button></div>
         <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">タグ</span><div class="plus-list" id="f-tag-list"></div></div>
         <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">メモ</span><textarea class="f-inp left" id="f-memo" rows="2" placeholder="任意"></textarea></div>
       </div>
@@ -203,8 +203,8 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
         <div class="f-row hidden" id="e-period-row"><span class="f-lbl">イベント期間</span><div class="period-ctl"><input class="plus-input" type="date" id="e-period-start"/><input class="plus-input" type="date" id="e-period-end"/></div><button class="mini-plus" onclick="toggleEditPeriod()" type="button">−</button></div>
         <div class="f-row"><span class="f-lbl">URL</span><div class="plus-list" id="e-url-list"></div></div>
         <div class="f-row"><span class="f-lbl">マップ</span><input class="f-inp" type="url" id="e-map"/></div>
-        <div class="f-row"><span class="f-lbl">画像URL</span><input class="f-inp" type="url" id="e-image" oninput="previewImage('e-image','e-image-preview')"/></div>
-        <div class="f-row"><span class="f-lbl">画像プレビュー</span><img id="e-image-preview" class="preview-img" alt="preview"/></div>
+        <div class="f-row"><span class="f-lbl">画像</span><input class="f-inp" type="file" id="e-image" accept="image/*" onchange="previewFile('e-image','e-image-preview')"/></div>
+        <div class="f-row" id="e-image-preview-row" style="display:none"><span class="f-lbl">画像プレビュー</span><img id="e-image-preview" class="preview-img" alt="preview"/><button class="mini-del" onclick="clearImage('e-image','e-image-preview')" style="margin-left:8px;">×</button></div>
         <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">タグ</span><div class="plus-list" id="e-tag-list"></div></div>
         <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">メモ</span><textarea class="f-inp left" id="e-memo" rows="2"></textarea></div>
         <div class="f-row" id="e-doneDateRow" style="display:none"><span class="f-lbl">実行日</span><input class="f-inp" type="date" id="e-donedate"/></div>
@@ -420,6 +420,44 @@ function previewImage(inputId,imgId){
   img.onerror=()=>{img.style.display='none'};
 }
 
+function previewFile(inputId,imgId){
+  const fileInput=document.getElementById(inputId);
+  const img=document.getElementById(imgId);
+  const row=document.getElementById(inputId.replace('image','image-preview-row'));
+  const file=fileInput.files[0];
+  if(!file){
+    img.style.display='none';
+    img.src='';
+    row.style.display='none';
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=function(e){
+    img.src=e.target.result;
+    img.style.display='block';
+    row.style.display='flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+function readFileAsDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function clearImage(inputId, imgId){
+  document.getElementById(inputId).value = '';
+  const img = document.getElementById(imgId);
+  img.style.display = 'none';
+  img.src = '';
+  const row = document.getElementById(inputId.replace('image','image-preview-row'));
+  row.style.display = 'none';
+}
+
 function toggleAddPeriod(){
   const dateRow = document.getElementById('f-date-row');
   const periodRow = document.getElementById('f-period-row');
@@ -450,7 +488,7 @@ function openAdd(){
   document.getElementById('f-period-end').value='';
   document.getElementById('f-map').value='';
   document.getElementById('f-image').value='';
-  previewImage('f-image','f-image-preview');
+  previewFile('f-image','f-image-preview');
   document.getElementById('f-memo').value='';
   document.getElementById('f-donedate').value=todayStr();
   const fMeterA=document.getElementById('f-meter-a');
@@ -481,7 +519,7 @@ function buildEvent(type,prefix){
   return {eventType:'period',eventDate:'',period};
 }
 
-function submitAdd(){
+async function submitAdd(){
   const title=document.getElementById('f-title').value.trim();
   if(!title){alert('やりたいことを入力してください');return}
   const eventType = document.getElementById('f-period-row').classList.contains('hidden') ? 'single' : 'period';
@@ -489,10 +527,15 @@ function submitAdd(){
   const tags=collectPlusValues('f-tag-list');
   const urls=collectPlusValues('f-url-list');
   saveTags(tags);
+  let imageData = '';
+  const file = document.getElementById('f-image').files[0];
+  if(file){
+    imageData = await readFileAsDataURL(file);
+  }
   items.push({
     id:uid(),title,regDate:todayStr(),createdAt:new Date().toISOString(),
     ...ev,
-    urls,mapUrl:document.getElementById('f-map').value.trim(),imageUrl:document.getElementById('f-image').value.trim(),
+    urls,mapUrl:document.getElementById('f-map').value.trim(),imageUrl:imageData,
     memo:document.getElementById('f-memo').value.trim(),registrar:U.id,status:fStatus,
     doneDate:fStatus==='done'?(document.getElementById('f-donedate').value||todayStr()):null,
     tags,meter:{[U.id]:fMeterTouched?Number(document.getElementById('f-meter-a').value):null,[P.id]:null}
@@ -516,7 +559,7 @@ function openDetail(id){
   editingId=id;
   const tags=(w.tags||[]).length?(w.tags||[]).map(t=>`<span class='tag-chip'>${esc(t)}</span>`).join(' '):'—';
   const eventText=w.eventType==='period'?(w.period||'—'):(w.eventDate?fmtDay(w.eventDate):'—');
-  const img=w.imageUrl?`<div class="det-row"><span class="det-k">画像</span><span class="det-v"><a href="${esc(w.imageUrl)}" target="_blank" rel="noopener">画像を開く</a></span></div>`:'';
+  const img=w.imageUrl?`<div class="det-row"><span class="det-k">画像</span><span class="det-v"><img src="${esc(w.imageUrl)}" style="max-width:100%;border-radius:10px;" alt="画像"/></span></div>`:'';
   document.getElementById('detBody').innerHTML=`
     <div class="det-title">${esc(w.title)}</div>
     <div class="det-row"><span class="det-k">ステータス</span><span class="det-v">${w.status==='done'?'✅ 実行済み':'⏳ 未実行'}</span></div>
@@ -580,8 +623,18 @@ function openEdit(){
   document.getElementById('e-period-row').classList.toggle('hidden',!isPeriod);
   document.getElementById('e-date-row').classList.toggle('hidden',isPeriod);
   document.getElementById('e-map').value=w.mapUrl||'';
-  document.getElementById('e-image').value=w.imageUrl||'';
-  previewImage('e-image','e-image-preview');
+  document.getElementById('e-image').value=''; // ファイル入力は空
+  const img=document.getElementById('e-image-preview');
+  const row=document.getElementById('e-image-preview-row');
+  if(w.imageUrl){
+    img.src=w.imageUrl;
+    img.style.display='block';
+    row.style.display='flex';
+  }else{
+    img.style.display='none';
+    img.src='';
+    row.style.display='none';
+  }
   document.getElementById('e-memo').value=w.memo||'';
   document.getElementById('e-donedate').value=w.doneDate||todayStr();
   document.getElementById('e-doneDateRow').style.display=w.status==='done'?'flex':'none';
@@ -599,7 +652,7 @@ function openEdit(){
   ((w.tags&&w.tags.length)?w.tags:['']).forEach(v=>addTagInput('e-tag-list',v));
   closeM('detModal');openM('editModal');
 }
-function submitEdit(){
+async function submitEdit(){
   const w=items.find(x=>x.id===editingId);if(!w)return;
   const title=document.getElementById('e-title').value.trim();
   if(!title){alert('やりたいことを入力してください');return}
@@ -609,11 +662,17 @@ function submitEdit(){
   const urls=collectPlusValues('e-url-list');
   saveTags(tags);
 
+  let imageData = w.imageUrl || '';
+  const file = document.getElementById('e-image').files[0];
+  if(file){
+    imageData = await readFileAsDataURL(file);
+  }
+
   w.title=title;
   Object.assign(w,ev);
   w.urls=urls;
   w.mapUrl=document.getElementById('e-map').value.trim();
-  w.imageUrl=document.getElementById('e-image').value.trim();
+  w.imageUrl=imageData;
   w.memo=document.getElementById('e-memo').value.trim();
   w.tags=tags;
   w.meter={[U.id]:eMeterTouched?Number(document.getElementById('e-meter-a').value):w.meter?.[U.id] ?? null,[P.id]:w.meter?.[P.id] ?? null};
