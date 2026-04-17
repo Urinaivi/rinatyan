@@ -206,7 +206,15 @@ function ensureSeasons(){
   const now=new Date(),y=now.getFullYear();
   [y-1,y,y+1].forEach(yr=>SEASON_DEFS.forEach(def=>{const id=`${yr}-${def.key}`;if(!bingoData.seasons.find(s=>s.id===id)){const dates=buildSeasonDates(yr,def);bingoData.seasons.push({id,year:yr,seasonKey:def.key,label:`${yr}年 ${def.emoji}${def.label}`,start:dates.start,end:dates.end,cells:Array(BINGO_SIZE*BINGO_SIZE).fill(null),generatedAt:new Date().toISOString()})}}));
   bingoData.seasons.sort((a,b)=>a.start.localeCompare(b.start));
-  const y3=3*365*24*60*60*1000;bingoData.seasons=bingoData.seasons.filter(s=>Date.now()-new Date(s.generatedAt).getTime()<y3);
+  const y3=3*365*24*60*60*1000;
+  bingoData.seasons=bingoData.seasons.filter(s=>{
+    if(!s.generatedAt){
+      s.generatedAt=new Date().toISOString();
+      return true;
+    }
+    const age=Date.now()-new Date(s.generatedAt).getTime();
+    return !Number.isNaN(age) && age < y3;
+  });
   persist();
 }
 function isExpired(s){return new Date()>new Date(s.end+'T23:59:59')}
@@ -215,9 +223,7 @@ function currentSeasonIdx(){const i=bingoData.seasons.findIndex(s=>isActive(s));
 function cleanBingoTitle(text){
   if(!text)return'';
   return String(text)
-    .replace(/data:image\/[^
-\s,]+/gi,'')
-    .replace(/data:[^\s,]+/gi,'')
+    .replace(/data:[^\s]*/gi,'')
     .replace(/\s{2,}/g,' ')
     .trim();
 }
@@ -259,7 +265,8 @@ function render(){
     else if(cell&&cell.cleared)cls+=' cleared';
     else if(editMode&&!expired)cls+=!cell?' empty-cell edit-hover':' edit-hover';
     else if(!cell)cls+=' empty-cell';
-    const label=cell?(cell.title.length>10?cell.title.slice(0,9)+'…':cell.title):(editMode?'＋':'');
+    const title=cell?cleanBingoTitle(cell.title):'';
+    const label=title?(title.length>10?esc(title.slice(0,9)+'…'):esc(title)):(editMode?'＋':'');
     return`<div class="${cls}" onclick="cellTap(${i})">${label}</div>`;
   }).join('');
   const bingoHTML=bingoCount>0?`<div class="bingo-banner bingo-pop"><div class="bingo-banner-title">🎉 ${bingoCount}ライン ビンゴ達成！</div><div class="bingo-banner-sub">報酬をゲットしよう！ ✨</div></div>`:'';
@@ -292,7 +299,7 @@ function openPicker(currentCell){
     alert('選択できるやりたいことがありません\n（既にビンゴ登録済み、または実行済みは除外されています）');
     if(!currentCell)return;
   }
-  const itemsHTML=selectable.map(w=>`<div class="pick-item" onclick="pickWants('${w.id}')"><div class="pick-main"><div class="pick-title">${w.title}</div><div class="pick-sub">${accountIcon(w.registrar)} ${accountName(w.registrar)} · ⏳ 未実行</div></div></div>`).join('');
+  const itemsHTML=selectable.map(w=>`<div class="pick-item" onclick="pickWants('${w.id}')"><div class="pick-main"><div class="pick-title">${esc(cleanBingoTitle(w.title))}</div><div class="pick-sub">${accountIcon(w.registrar)} ${accountName(w.registrar)} · ⏳ 未実行</div></div></div>`).join('');
   const clearBtn=currentCell?`<div class="f-card" style="margin-top:6px"><button class="pick-clear" onclick="clearCell()">🗑 このマスを空にする</button></div>`:'';
   document.getElementById('pickerList').innerHTML=`<div class="f-card">${itemsHTML}</div>${clearBtn}<div style="height:8px"></div>`;
   openM('pickerModal');
@@ -308,7 +315,8 @@ function clearCell(){bingoData.seasons[seasonIdx].cells[pickerCellIdx]=null;pers
 
 function showCellDetail(cell,idx){
   const w=loadWants().find(x=>x.id===cell.wantsId);
-  document.getElementById('cellViewBody').innerHTML=`<div style="padding:4px 16px 12px;font-size:18px;font-weight:700;color:var(--text)">${cell.title}</div><div class="det-row"><span class="det-k">状態</span><span class="det-v">${cell.cleared?'✅ クリア済み':'⏳ 未クリア'}</span></div><div class="det-row"><span class="det-k">マス番号</span><span class="det-v">${idx+1} / ${BINGO_SIZE*BINGO_SIZE}</span></div>${w?`<div class="det-row"><span class="det-k">登録者</span><span class="det-v">${accountIcon(w.registrar)} ${accountName(w.registrar)}</span></div>${w.doneDate?`<div class="det-row"><span class="det-k">実行日</span><span class="det-v">${fmtDate(w.doneDate)}</span></div>`:''} ${w.period?`<div class="det-row"><span class="det-k">期間</span><span class="det-v">${w.period}</span></div>`:''} ${w.memo?`<div class="det-row"><span class="det-k">メモ</span><span class="det-v">${w.memo}</span></div>`:''}`:''}`; 
+  const title=esc(cleanBingoTitle(cell.title));
+  document.getElementById('cellViewBody').innerHTML=`<div style="padding:4px 16px 12px;font-size:18px;font-weight:700;color:var(--text)">${title}</div><div class="det-row"><span class="det-k">状態</span><span class="det-v">${cell.cleared?'✅ クリア済み':'⏳ 未クリア'}</span></div><div class="det-row"><span class="det-k">マス番号</span><span class="det-v">${idx+1} / ${BINGO_SIZE*BINGO_SIZE}</span></div>${w?`<div class="det-row"><span class="det-k">登録者</span><span class="det-v">${accountIcon(w.registrar)} ${accountName(w.registrar)}</span></div>${w.doneDate?`<div class="det-row"><span class="det-k">実行日</span><span class="det-v">${fmtDate(w.doneDate)}</span></div>`:''} ${w.period?`<div class="det-row"><span class="det-k">期間</span><span class="det-v">${w.period}</span></div>`:''} ${w.memo?`<div class="det-row"><span class="det-k">メモ</span><span class="det-v">${w.memo}</span></div>`:''}`:''}`; 
   openM('cellViewModal');
 }
 
