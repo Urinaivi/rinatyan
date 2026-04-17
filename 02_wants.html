@@ -90,10 +90,11 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
 .filter-row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:.5px solid var(--border)}
 .filter-row:last-child{border-bottom:none}
 .filter-lbl{font-size:14px;color:var(--text)}
-.plus-ctl{margin-left:auto;display:flex;align-items:center;gap:8px;flex:1;min-width:0}
-.plus-list{display:flex;flex-direction:column;gap:8px;flex:1}
-.plus-row{display:flex;align-items:center;gap:8px}
-.plus-input{flex:1;background:#f5f5fa;border:1px solid #e6e7ef;border-radius:10px;padding:8px 10px;font-size:13px;color:var(--text);font-family:'Noto Sans JP',sans-serif}
+
+.plus-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;flex:1}
+.plus-row{display:flex;align-items:center;gap:8px;flex:1;min-width:200px;justify-content:flex-start}
+.period-ctl{display:flex;flex-direction:column;gap:8px;flex:1}
+.plus-input{ width:150px; background:#f5f5fa;border:1px solid #e6e7ef;border-radius:10px;padding:8px 10px;font-size:13px;color:var(--text);font-family:'Noto Sans JP',sans-serif}
 .plus-input:focus{outline:none;border-color:var(--accent)}
 .mini-plus,.mini-del{border:none;border-radius:999px;width:25px;height:25px;font-size:15px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
 .mini-plus{background:#eceeff;color:var(--accent)}
@@ -156,13 +157,13 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
       <div class="sh-hdr"><span class="sh-title">やりたいことを追加</span><button class="x-btn" onclick="closeM('addModal')">✕</button></div>
       <div class="f-card">
         <div class="f-row"><span class="f-lbl">やりたいこと</span><input class="f-inp" type="text" id="f-title" placeholder="例：花畑へ行く"/></div>
-        <div class="f-row"><span class="f-lbl">イベント日付</span><div class="plus-ctl"><input class="plus-input" type="date" id="f-event-day"/><button class="mini-plus" onclick="toggleAddPeriod()" type="button">＋</button></div></div>
-        <div class="f-row hidden" id="f-period-row"><span class="f-lbl">イベント期間</span><div class="plus-ctl"><input class="plus-input" type="date" id="f-period-start"/><input class="plus-input" type="date" id="f-period-end"/><button class="mini-plus" onclick="toggleAddPeriod()" type="button">−</button></div></div>
-        <div class="f-row"><span class="f-lbl">URL</span><div class="plus-ctl"><div class="plus-list" id="f-url-list"></div><button class="mini-plus" type="button" onclick="addPlusInput('f-url-list','url')">＋</button></div></div>
+        <div class="f-row" id="f-date-row"><span class="f-lbl">イベント日付</span><input class="plus-input" type="date" id="f-event-day"/><button class="mini-plus" onclick="toggleAddPeriod()" type="button">＋</button></div>
+        <div class="f-row hidden" id="f-period-row"><span class="f-lbl">イベント期間</span><div class="period-ctl"><input class="plus-input" type="date" id="f-period-start"/><input class="plus-input" type="date" id="f-period-end"/></div><button class="mini-plus" onclick="toggleAddPeriod()" type="button">−</button></div>
+        <div class="f-row"><span class="f-lbl">URL</span><div class="plus-list" id="f-url-list"></div></div>
         <div class="f-row"><span class="f-lbl">マップ</span><input class="f-inp" type="url" id="f-map" placeholder="GoogleMapなど"/></div>
         <div class="f-row"><span class="f-lbl">画像URL</span><input class="f-inp" type="url" id="f-image" placeholder="https://..." oninput="previewImage('f-image','f-image-preview')"/></div>
         <div class="f-row"><span class="f-lbl">画像プレビュー</span><img id="f-image-preview" class="preview-img" alt="preview"/></div>
-        <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">タグ</span><div class="plus-ctl"><div class="plus-list" id="f-tag-list"></div><button class="mini-plus" type="button" onclick="addTagInput('f-tag-list')">＋</button></div></div>
+        <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">タグ</span><div class="plus-list" id="f-tag-list"></div></div>
         <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">メモ</span><textarea class="f-inp left" id="f-memo" rows="2" placeholder="任意"></textarea></div>
       </div>
       <div class="f-card">
@@ -193,13 +194,13 @@ textarea.f-inp{text-align:left;resize:none;line-height:1.6;padding:2px 0}
       <div class="sh-hdr"><span class="sh-title">やりたいことを編集</span><button class="x-btn" onclick="closeM('editModal')">✕</button></div>
       <div class="f-card">
         <div class="f-row"><span class="f-lbl">やりたいこと</span><input class="f-inp" type="text" id="e-title"/></div>
-        <div class="f-row"><span class="f-lbl">イベント日付</span><div class="plus-ctl"><input class="plus-input" type="date" id="e-event-day"/><button class="mini-plus" onclick="toggleEditPeriod()" type="button">＋</button></div></div>
-        <div class="f-row hidden" id="e-period-row"><span class="f-lbl">イベント期間</span><div class="plus-ctl"><input class="plus-input" type="date" id="e-period-start"/><input class="plus-input" type="date" id="e-period-end"/><button class="mini-plus" onclick="toggleEditPeriod()" type="button">−</button></div></div>
-        <div class="f-row"><span class="f-lbl">URL</span><div class="plus-ctl"><div class="plus-list" id="e-url-list"></div><button class="mini-plus" type="button" onclick="addPlusInput('e-url-list','url')">＋</button></div></div>
+        <div class="f-row" id="e-date-row"><span class="f-lbl">イベント日付</span><input class="plus-input" type="date" id="e-event-day"/><button class="mini-plus" onclick="toggleEditPeriod()" type="button">＋</button></div>
+        <div class="f-row hidden" id="e-period-row"><span class="f-lbl">イベント期間</span><div class="period-ctl"><input class="plus-input" type="date" id="e-period-start"/><input class="plus-input" type="date" id="e-period-end"/></div><button class="mini-plus" onclick="toggleEditPeriod()" type="button">−</button></div>
+        <div class="f-row"><span class="f-lbl">URL</span><div class="plus-list" id="e-url-list"></div></div>
         <div class="f-row"><span class="f-lbl">マップ</span><input class="f-inp" type="url" id="e-map"/></div>
         <div class="f-row"><span class="f-lbl">画像URL</span><input class="f-inp" type="url" id="e-image" oninput="previewImage('e-image','e-image-preview')"/></div>
         <div class="f-row"><span class="f-lbl">画像プレビュー</span><img id="e-image-preview" class="preview-img" alt="preview"/></div>
-        <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">タグ</span><div class="plus-ctl"><div class="plus-list" id="e-tag-list"></div><button class="mini-plus" type="button" onclick="addTagInput('e-tag-list')">＋</button></div></div>
+        <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">タグ</span><div class="plus-list" id="e-tag-list"></div></div>
         <div class="f-row" style="align-items:flex-start;padding-top:14px"><span class="f-lbl" style="padding-top:2px">メモ</span><textarea class="f-inp left" id="e-memo" rows="2"></textarea></div>
         <div class="f-row" id="e-doneDateRow" style="display:none"><span class="f-lbl">実行日</span><input class="f-inp" type="date" id="e-donedate"/></div>
         <div class="f-row"><span class="f-lbl">やりたい度</span><div class="meter-wrap"><div class="meter-row"><span id="e-meter-a-name"></span><input type="range" id="e-meter-a" min="1" max="5" value="3"/></div><div class="meter-row"><span id="e-meter-b-name"></span><input type="range" id="e-meter-b" min="1" max="5" value="3"/></div></div></div>
@@ -371,7 +372,7 @@ function drawPie(id,data,colors){
 function clearPlusList(id){document.getElementById(id).innerHTML=''}
 function addPlusInput(listId,type,val=''){
   const row=document.createElement('div');row.className='plus-row';
-  row.innerHTML=`<input class="plus-input" type="${type==='url'?'url':'text'}" value="${esc(val)}" placeholder="${type==='url'?'https://...':'値を入力'}"><button class="mini-del" type="button">−</button>`;
+  row.innerHTML=`<input class="plus-input" type="${type==='url'?'url':'text'}" value="${esc(val)}" placeholder="${type==='url'?'https://...':'値を入力'}"><button class="mini-del" type="button">−</button><button class="mini-plus" type="button" onclick="addPlusInput('${listId}','${type}')">＋</button>`;
   row.querySelector('.mini-del').onclick=()=>row.remove();
   document.getElementById(listId).appendChild(row);
 }
@@ -388,8 +389,9 @@ function saveTags(tags){
 }
 function addTagInput(listId,val=''){
   const row=document.createElement('div');row.className='plus-row';
-  row.innerHTML=`<div style="flex:1"><input class="plus-input" type="text" value="${esc(val)}" placeholder="タグ入力"><div class="tag-drop hidden"></div></div><button class="mini-del" type="button">−</button>`;
+  row.innerHTML=`<div style="flex:1"><input class="plus-input" type="text" value="${esc(val)}" placeholder="タグ入力"><div class="tag-drop hidden"></div></div><button class="mini-del" type="button">−</button><button class="mini-plus" type="button" onclick="addTagInput('${listId}')">＋</button>`;
   const input=row.querySelector('.plus-input'),drop=row.querySelector('.tag-drop');
+  row.querySelector('.mini-del').onclick=()=>row.remove();
   const refresh=()=>{
     const q=input.value.trim().toLowerCase();
     const cands=tagCandidates().filter(t=>t.toLowerCase().includes(q)).slice(0,6);
@@ -401,7 +403,6 @@ function addTagInput(listId,val=''){
   input.addEventListener('input',refresh);
   input.addEventListener('focus',refresh);
   input.addEventListener('blur',()=>setTimeout(()=>drop.classList.add('hidden'),120));
-  row.querySelector('.mini-del').onclick=()=>row.remove();
   document.getElementById(listId).appendChild(row);
 }
 
@@ -413,15 +414,27 @@ function previewImage(inputId,imgId){
   img.onerror=()=>{img.style.display='none'};
 }
 
-let addUsePeriod=false;
 function toggleAddPeriod(){
-  addUsePeriod=!addUsePeriod;
-  document.getElementById('f-period-row').classList.toggle('hidden',!addUsePeriod);
+  const dateRow = document.getElementById('f-date-row');
+  const periodRow = document.getElementById('f-period-row');
+  if (periodRow.classList.contains('hidden')) {
+    dateRow.classList.add('hidden');
+    periodRow.classList.remove('hidden');
+  } else {
+    dateRow.classList.remove('hidden');
+    periodRow.classList.add('hidden');
+  }
 }
-let editUsePeriod=false;
 function toggleEditPeriod(){
-  editUsePeriod=!editUsePeriod;
-  document.getElementById('e-period-row').classList.toggle('hidden',!editUsePeriod);
+  const dateRow = document.getElementById('e-date-row');
+  const periodRow = document.getElementById('e-period-row');
+  if (periodRow.classList.contains('hidden')) {
+    dateRow.classList.add('hidden');
+    periodRow.classList.remove('hidden');
+  } else {
+    dateRow.classList.remove('hidden');
+    periodRow.classList.add('hidden');
+  }
 }
 
 function openAdd(){
@@ -438,7 +451,8 @@ function openAdd(){
   document.getElementById('f-meter-b').value=3;
   clearPlusList('f-url-list');addPlusInput('f-url-list','url');
   clearPlusList('f-tag-list');addTagInput('f-tag-list');
-  addUsePeriod=false;document.getElementById('f-period-row').classList.add('hidden');
+  document.getElementById('f-date-row').classList.remove('hidden');
+  document.getElementById('f-period-row').classList.add('hidden');
   document.getElementById('addRegLabel').innerHTML=iconHTML(U.icon,14)+' '+U.name;
   setAddStatus('pending');openM('addModal');
 }
@@ -459,7 +473,8 @@ function buildEvent(type,prefix){
 function submitAdd(){
   const title=document.getElementById('f-title').value.trim();
   if(!title){alert('やりたいことを入力してください');return}
-  const ev=buildEvent(addUsePeriod?'period':'single','f');if(!ev)return;
+  const eventType = document.getElementById('f-period-row').classList.contains('hidden') ? 'single' : 'period';
+  const ev=buildEvent(eventType,'f');if(!ev)return;
   const tags=collectPlusValues('f-tag-list');
   const urls=collectPlusValues('f-url-list');
   saveTags(tags);
@@ -521,8 +536,9 @@ function openEdit(){
   const [s,e]=parsePeriod(w.period||'');
   document.getElementById('e-period-start').value=s;
   document.getElementById('e-period-end').value=e;
-  editUsePeriod=w.eventType==='period';
-  document.getElementById('e-period-row').classList.toggle('hidden',!editUsePeriod);
+  const isPeriod = w.eventType==='period';
+  document.getElementById('e-period-row').classList.toggle('hidden',!isPeriod);
+  document.getElementById('e-date-row').classList.toggle('hidden',isPeriod);
   document.getElementById('e-map').value=w.mapUrl||'';
   document.getElementById('e-image').value=w.imageUrl||'';
   previewImage('e-image','e-image-preview');
@@ -542,7 +558,8 @@ function submitEdit(){
   const w=items.find(x=>x.id===editingId);if(!w)return;
   const title=document.getElementById('e-title').value.trim();
   if(!title){alert('やりたいことを入力してください');return}
-  const ev=buildEvent(editUsePeriod?'period':'single','e');if(!ev)return;
+  const eventType = document.getElementById('e-period-row').classList.contains('hidden') ? 'single' : 'period';
+  const ev=buildEvent(eventType,'e');if(!ev)return;
   const tags=collectPlusValues('e-tag-list');
   const urls=collectPlusValues('e-url-list');
   saveTags(tags);
