@@ -12,13 +12,12 @@
 html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;align-items:center;font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
 .phone{width:min(390px,100vw);height:min(844px,100dvh);background:var(--bg);border-radius:clamp(0px,calc((100vw - 390px)*-99),48px);overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 40px 80px rgba(0,0,0,.28),0 0 0 1px rgba(0,0,0,.09)}
 .hdr{padding:max(52px,env(safe-area-inset-top,52px)) 20px 10px;background:var(--bg);flex-shrink:0}
-.hdr-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.hdr-title{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.3px}
-.gas-btn{border:none;background:#e4e4e9;color:var(--text);padding:8px 12px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
-.gas-btn:active{transform:scale(.96)}
+.hdr-top{display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-size:22px;font-weight:700;color:var(--text)}
+.gas-btn{width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;background:#e4e4e9;font-size:20px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.gas-btn:active{background:#d1d1d6}
 .tab-bar{display:flex;gap:8px;padding:4px 16px 12px;background:var(--bg);align-items:center;flex-shrink:0}
-.tab-pill{padding:9px 18px;border-radius:22px;font-size:14px;font-weight:600;font-family:'Noto Sans JP',sans-serif;border:none;cursor:pointer;transition:background .2s,color .2s,transform .1s;white-space:nowrap}
-.tab-pill:active{transform:scale(.95)}
+.tab-pill{padding:9px 18px;border-radius:22px;font-size:14px;font-weight:600;font-family:'Noto Sans JP',sans-serif;border:none;cursor:pointer;transition:background .2s,color .2s;white-space:nowrap}
 .tab-pill.on{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(124,122,255,.35)}
 .tab-pill.off{background:#e4e4e9;color:var(--sub)}
 .tab-arrow{display:flex;align-items:center;justify-content:center;width:28px;height:28px;color:var(--muted);flex-shrink:0;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
@@ -32,11 +31,13 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
 .c-main{flex:1;min-width:0}
 .c-date{font-size:15px;color:var(--text)}
 .c-memo{font-size:12px;color:var(--sub);margin-top:2px}
+.c-hist{font-size:11px;color:var(--accent);margin-top:2px}
 .c-right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .c-amount{font-size:16px;font-weight:600;color:var(--text)}
 .badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block}
 .b-red{background:#ffe5e4;color:var(--red)}
 .b-green{background:#e3f9eb;color:var(--green)}
+.b-partial{background:#fff3e0;color:#ff9500}
 .empty-row{padding:20px;text-align:center;font-size:14px;color:var(--muted)}
 .sum-card{background:var(--card);border-radius:var(--r);overflow:hidden;margin-bottom:6px}
 .sum-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:.5px solid var(--border)}
@@ -45,10 +46,14 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
 .sum-val{font-size:16px;font-weight:700;color:var(--text)}
 .sum-val.pos{color:var(--green)}
 .sum-val.neg{color:var(--red)}
-.fab{position:absolute;bottom:calc(var(--nav) + env(safe-area-inset-bottom,0px) + 18px);right:18px;width:54px;height:54px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(124,122,255,.5);transition:transform .15s;z-index:20}
+/* 2つのFAB */
+.fab-group{position:absolute;bottom:calc(var(--nav) + env(safe-area-inset-bottom,0px) + 18px);right:18px;display:flex;flex-direction:column;gap:10px;z-index:20}
+.fab{width:54px;height:54px;border-radius:50%;border:none;cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;transition:transform .15s;box-shadow:0 4px 18px rgba(0,0,0,.22)}
 .fab:active{transform:scale(.91)}
+.fab-add{background:var(--accent);color:#fff}
+.fab-pay{background:var(--green);color:#fff;font-size:20px}
 .nav{height:calc(var(--nav) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(250,250,250,.96);border-top:.5px solid var(--border);display:flex;align-items:flex-start;flex-shrink:0;backdrop-filter:blur(20px);z-index:30}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:10px 0 6px;border:none;background:none;-webkit-tap-highlight-color:transparent;transition:transform .1s}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:10px 0 6px;border:none;background:none;-webkit-tap-highlight-color:transparent;transition:transform .1s;position:relative}
 .nav-item:active{transform:scale(.88)}
 .nav-icon{font-size:20px;line-height:1}
 .nav-lbl{font-size:10px;font-weight:500;color:var(--muted)}
@@ -62,10 +67,10 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
 .sh-title{font-size:17px;font-weight:700;color:var(--text)}
 .x-btn{width:28px;height:28px;border-radius:50%;background:#e4e4e9;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--sub)}
 .f-card{background:var(--card);border-radius:var(--r);margin:0 14px 10px;overflow:hidden}
-.f-row{display:flex;align-items:flex-start;min-width:0;padding:13px 16px;border-bottom:.5px solid var(--border);gap:10px}
+.f-row{display:flex;align-items:flex-start;padding:13px 16px;border-bottom:.5px solid var(--border);gap:10px}
 .f-row:last-child{border-bottom:none}
 .f-lbl{font-size:15px;color:var(--text);min-width:86px;flex-shrink:0;padding-top:2px;white-space:nowrap}
-.f-inp{flex:1;min-width:0;width:100%;border:none;outline:none;font-size:15px;font-family:'Noto Sans JP',sans-serif;color:var(--text);background:transparent;text-align:right}
+.f-inp{flex:1;min-width:0;border:none;outline:none;font-size:15px;font-family:'Noto Sans JP',sans-serif;color:var(--text);background:transparent;text-align:right}
 .f-inp::placeholder{color:#c7c7cc}
 input[type=datetime-local]{color-scheme:light}
 .tgl-g{display:flex;gap:6px;margin-left:auto}
@@ -74,17 +79,27 @@ input[type=datetime-local]{color-scheme:light}
 .tgl-accent{background:var(--accent);color:#fff}
 .tgl-green{background:var(--green);color:#fff}
 .tgl-red{background:var(--red);color:#fff}
-.ok-btn{display:block;width:calc(100% - 28px);margin:2px 14px 22px;padding:15px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:16px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;letter-spacing:.04em;transition:opacity .15s,transform .12s}
+.ok-btn{display:block;width:calc(100% - 28px);margin:2px 14px 12px;padding:15px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-size:16px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;letter-spacing:.04em;transition:opacity .15s,transform .12s}
 .ok-btn:active{opacity:.82;transform:scale(.98)}
+.ok-btn.green{background:var(--green)}
 .del-btn{display:block;width:calc(100% - 28px);margin:4px 14px 22px;padding:13px;background:#ffe5e4;color:var(--red);border:none;border-radius:var(--r);font-size:15px;font-weight:600;font-family:'Noto Sans JP',sans-serif;cursor:pointer}
 .det-title{font-size:22px;font-weight:700;color:var(--text);padding:4px 16px 14px}
 .det-row{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 16px;border-bottom:.5px solid var(--border);font-size:14px;gap:12px}
 .det-row:last-child{border-bottom:none}
 .det-k{color:var(--sub);flex-shrink:0}
 .det-v{color:var(--text);font-weight:500;text-align:right;word-break:break-all}
+/* 支払経過履歴 */
+.hist-list{padding:0 14px 8px}
+.hist-item{background:var(--card);border-radius:10px;padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hist-date{font-size:12px;color:var(--sub)}
+.hist-amount{font-size:15px;font-weight:600;color:var(--green)}
 .gas-result{margin:4px 14px 14px;background:var(--card);border-radius:var(--r);padding:12px 14px}
 .gas-result-lbl{font-size:12px;color:var(--sub)}
 .gas-result-val{font-size:24px;font-weight:700;color:var(--text);margin-top:4px}
+/* 差額支払いモーダル */
+.diff-info{margin:0 14px 10px;background:var(--card);border-radius:var(--r);padding:14px 16px}
+.diff-info-title{font-size:13px;color:var(--sub);margin-bottom:4px}
+.diff-info-val{font-size:24px;font-weight:700;color:var(--text)}
 @keyframes slideR{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
 @keyframes slideL{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
 .anim-r{animation:slideR .2s ease forwards}
@@ -96,7 +111,7 @@ input[type=datetime-local]{color-scheme:light}
   <div class="hdr">
     <div class="hdr-top">
       <div class="hdr-title">支払い管理</div>
-      <button class="gas-btn" onclick="openGasCalc()">⛽ ガソリン代計算</button>
+      <button class="gas-btn" onclick="openGasCalc()">⛽</button>
     </div>
   </div>
   <div class="tab-bar">
@@ -109,9 +124,14 @@ input[type=datetime-local]{color-scheme:light}
     <button class="tab-pill off" id="tabB" onclick="switchTab('partner')"></button>
   </div>
   <div class="scroll" id="scroll"></div>
-  <button class="fab" onclick="openAdd()">＋</button>
+  <!-- 右下2つのFAB -->
+  <div class="fab-group">
+    <button class="fab fab-pay" onclick="openDiffPay()" title="差額支払い">💳</button>
+    <button class="fab fab-add" onclick="openAdd()" title="追加">＋</button>
+  </div>
   <nav class="nav" id="nav"></nav>
 
+  <!-- 支払い追加 -->
   <div class="overlay" id="addModal" onclick="bgClose(event,'addModal')">
     <div class="sheet">
       <div class="sh-handle"></div>
@@ -130,6 +150,7 @@ input[type=datetime-local]{color-scheme:light}
     </div>
   </div>
 
+  <!-- 支払い詳細 -->
   <div class="overlay" id="detModal" onclick="bgClose(event,'detModal')">
     <div class="sheet">
       <div class="sh-handle"></div>
@@ -139,10 +160,43 @@ input[type=datetime-local]{color-scheme:light}
     </div>
   </div>
 
+  <!-- 途中支払いモーダル -->
+  <div class="overlay" id="partialModal" onclick="bgClose(event,'partialModal')">
+    <div class="sheet">
+      <div class="sh-handle"></div>
+      <div class="sh-hdr"><span class="sh-title">途中支払いを記録</span><button class="x-btn" onclick="closeM('partialModal')">✕</button></div>
+      <div class="f-card">
+        <div class="f-row"><span class="f-lbl">支払い額</span><input class="f-inp" type="number" id="p-amount" placeholder="0" min="1"/><span style="font-size:14px;color:var(--sub);flex-shrink:0">円</span></div>
+        <div class="f-row"><span class="f-lbl">日時</span><input class="f-inp" type="datetime-local" id="p-date"/></div>
+        <div class="f-row"><span class="f-lbl">メモ</span><input class="f-inp" type="text" id="p-memo" placeholder="任意"/></div>
+      </div>
+      <button class="ok-btn green" onclick="submitPartial()">記録する</button>
+    </div>
+  </div>
+
+  <!-- 差額支払いモーダル -->
+  <div class="overlay" id="diffPayModal" onclick="bgClose(event,'diffPayModal')">
+    <div class="sheet">
+      <div class="sh-handle"></div>
+      <div class="sh-hdr"><span class="sh-title">差額支払い</span><button class="x-btn" onclick="closeM('diffPayModal')">✕</button></div>
+      <div class="diff-info">
+        <div class="diff-info-title" id="diffInfoTitle"></div>
+        <div class="diff-info-val" id="diffInfoVal"></div>
+      </div>
+      <div class="f-card">
+        <div class="f-row"><span class="f-lbl">支払い額</span><input class="f-inp" type="number" id="dp-amount" placeholder="0" min="1"/><span style="font-size:14px;color:var(--sub);flex-shrink:0">円</span></div>
+        <div class="f-row"><span class="f-lbl">日時</span><input class="f-inp" type="datetime-local" id="dp-date"/></div>
+        <div class="f-row"><span class="f-lbl">メモ</span><input class="f-inp" type="text" id="dp-memo" placeholder="差額支払い"/></div>
+      </div>
+      <button class="ok-btn green" onclick="submitDiffPay()">支払い処理する</button>
+    </div>
+  </div>
+
+  <!-- ガソリン代計算 -->
   <div class="overlay" id="gasModal" onclick="bgClose(event,'gasModal')">
     <div class="sheet">
       <div class="sh-handle"></div>
-      <div class="sh-hdr"><span class="sh-title">ガソリン代計算</span><button class="x-btn" onclick="closeM('gasModal')">✕</button></div>
+      <div class="sh-hdr"><span class="sh-title">⛽ ガソリン代計算</span><button class="x-btn" onclick="closeM('gasModal')">✕</button></div>
       <div class="f-card">
         <div class="f-row"><span class="f-lbl">走行距離</span><input class="f-inp" type="number" id="g-distance" placeholder="0" min="0" step="0.1"/><span style="font-size:14px;color:var(--sub);flex-shrink:0">km</span></div>
         <div class="f-row"><span class="f-lbl">ガソリン価格</span><input class="f-inp" type="number" id="g-price" placeholder="0" min="0" step="0.1"/><span style="font-size:14px;color:var(--sub);flex-shrink:0">円/L</span></div>
@@ -153,11 +207,11 @@ input[type=datetime-local]{color-scheme:light}
         <div class="f-row"><span class="f-lbl">メモ</span><input class="f-inp" type="text" id="g-memo" placeholder="ガソリン代"/></div>
       </div>
       <div class="gas-result">
-        <div class="gas-result-lbl">今回のガソリン代</div>
+        <div class="gas-result-lbl">今回のガソリン代（走行距離÷15×価格）</div>
         <div class="gas-result-val" id="g-result">¥0</div>
       </div>
       <button class="ok-btn" onclick="calcGas()">計算する</button>
-      <button class="ok-btn" id="g-claim-btn" onclick="claimGas()" disabled>請求する（未払いに追加）</button>
+      <button class="ok-btn green" id="g-claim-btn" onclick="claimGas()" style="margin-top:0" disabled>未払いに追加する</button>
     </div>
   </div>
 </div>
@@ -171,40 +225,37 @@ function nowISO(){const d=new Date();d.setSeconds(0,0);return d.toISOString().sl
 function fmtDT(s){if(!s)return'—';const d=new Date(s);if(isNaN(d))return s;const p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`}
 
 let payments,tab='me',fWho='me',fStatus='unpaid',gWho='me',gasAmount=0;
-let U,P; // current user / partner
+let U,P,partialTargetId=null;
 
 function init(){
   if(!requireLogin())return;
-  U=currentUser();P=getAccount(partnerId());
+  U=currentUser(); P=getAccount(partnerId());
   applyTheme(U.theme);
   document.getElementById('nav').innerHTML=navHTML('pay');
-  // タブラベル
-  document.getElementById('tabA').innerHTML=iconHTML(U.icon)+' '+U.name;
-  document.getElementById('tabB').innerHTML=iconHTML(P.icon)+' '+P.name;
-  document.getElementById('t-me').innerHTML=iconHTML(U.icon)+' '+U.name;
-  document.getElementById('t-partner').innerHTML=iconHTML(P.icon)+' '+P.name;
-  document.getElementById('g-me').innerHTML=iconHTML(U.icon)+' '+U.name;
-  document.getElementById('g-partner').innerHTML=iconHTML(P.icon)+' '+P.name;
-  // データ
-  try{const s=JSON.parse(localStorage.getItem(STORE));payments=(Array.isArray(s)&&s.length)?s:[];}catch{payments=[]}
-  // GAS同期してからレンダリング
+  document.getElementById('tabA').innerHTML=iconHTML(U.icon,14)+' '+U.name;
+  document.getElementById('tabB').innerHTML=iconHTML(P.icon,14)+' '+P.name;
+  document.getElementById('t-me').innerHTML=iconHTML(U.icon,14)+' '+U.name;
+  document.getElementById('t-partner').innerHTML=iconHTML(P.icon,14)+' '+P.name;
+  document.getElementById('g-me').innerHTML=iconHTML(U.icon,14)+' '+U.name;
+  document.getElementById('g-partner').innerHTML=iconHTML(P.icon,14)+' '+P.name;
+  try{const s=JSON.parse(localStorage.getItem(STORE));payments=(Array.isArray(s)&&s.length)?s.map(migratePayment):[];}catch{payments=[]}
   syncOnLoad(["payments","accounts"]).then(()=>{
-    try{const s=JSON.parse(localStorage.getItem(STORE));payments=(Array.isArray(s)&&s.length)?s:[];}catch{payments=[]}
-    autoDelete();render();
+    try{const s=JSON.parse(localStorage.getItem(STORE));payments=(Array.isArray(s)&&s.length)?s.map(migratePayment):[];}catch{}
+    autoDelete(); render();
   });
 }
 
+function migratePayment(p){ return {history:[], ...p}; }
+
 function autoDelete(){
-  const lim=90*24*60*60*1000,now=Date.now(),b=payments.length;
+  const lim=90*24*60*60*1000,now=Date.now();
   payments=payments.filter(p=>{
     if(!p.paidDate)return true;
     const t=new Date(p.paidDate).getTime();
-    if(Number.isNaN(t))return true;
-    return now-t<lim;
+    return isNaN(t)||now-t<lim;
   });
 }
 function persist(){localStorage.setItem(STORE,JSON.stringify(payments));syncOnSave('payments',payments);}
-
 function myId(){return U.id}
 function ptId(){return P.id}
 function tabId(){return tab==='me'?myId():ptId()}
@@ -223,14 +274,42 @@ function switchTab(t){
 function render(anim){
   const el=document.getElementById('scroll');
   const cid=tabId(),oid=tab==='me'?ptId():myId();
-  const mine=payments.filter(p=>p.who===cid),other=payments.filter(p=>p.who===oid);
-  const unpaid=mine.filter(p=>p.status==='unpaid').sort((a,b)=>b.date.localeCompare(a.date));
+  const mine=payments.filter(p=>p.who===cid);
+  const other=payments.filter(p=>p.who===oid);
+  const unpaid=mine.filter(p=>p.status==='unpaid'||p.status==='partial').sort((a,b)=>b.date.localeCompare(a.date));
   const paid=mine.filter(p=>p.status==='paid').sort((a,b)=>b.date.localeCompare(a.date));
   const unpaidTotal=unpaid.reduce((s,p)=>s+p.amount,0);
-  const otherUnpaid=other.filter(p=>p.status==='unpaid').reduce((s,p)=>s+p.amount,0);
+  const otherUnpaid=other.filter(p=>p.status==='unpaid'||p.status==='partial').reduce((s,p)=>s+p.amount,0);
   const diff=otherUnpaid-unpaidTotal,diffStr=(diff>=0?'＋':'－')+yen(Math.abs(diff)),diffCls=diff>=0?'pos':'neg';
-  const rowHTML=p=>`<div class="c-row" onclick="openDetail('${p.id}')"><div class="c-main"><div class="c-date">${fmtDT(p.date)}</div>${p.memo?`<div class="c-memo">${p.memo}</div>`:''}</div><div class="c-right"><div class="c-amount">${yen(p.amount)}</div><span class="badge ${p.status==='paid'?'b-green':'b-red'}">${p.status==='paid'?'支払済':'未支払'}</span></div></div>`;
-  el.innerHTML=`<div class="sec-lbl">未支払い</div><div class="c-list">${unpaid.length?unpaid.map(rowHTML).join(''):'<div class="empty-row">データなし</div>'}</div><div class="sec-lbl">支払い済み</div><div class="c-list">${paid.length?paid.map(rowHTML).join(''):'<div class="empty-row">データなし</div>'}</div><div class="sec-lbl">合計</div><div class="sum-card"><div class="sum-row"><span class="sum-lbl">未支払合計</span><span class="sum-val">${yen(unpaidTotal)}</span></div><div class="sum-row"><span class="sum-lbl">${whoName(oid)}との差額</span><span class="sum-val ${diffCls}">${diffStr}</span></div></div><div style="height:6px"></div>`;
+
+  const rowHTML=p=>{
+    const histCount=(p.history||[]).length;
+    const statusLabel=p.status==='paid'?'支払済':p.status==='partial'?'一部支払':' 未支払';
+    const badgeCls=p.status==='paid'?'b-green':p.status==='partial'?'b-partial':'b-red';
+    return `<div class="c-row" onclick="openDetail('${p.id}')">
+      <div class="c-main">
+        <div class="c-date">${fmtDT(p.date)}</div>
+        ${p.memo?`<div class="c-memo">${p.memo}</div>`:''}
+        ${histCount>0?`<div class="c-hist">支払い履歴 ${histCount}件</div>`:''}
+      </div>
+      <div class="c-right">
+        <div class="c-amount">${yen(p.amount)}</div>
+        <span class="badge ${badgeCls}">${statusLabel}</span>
+      </div>
+    </div>`;
+  };
+
+  el.innerHTML=`
+    <div class="sec-lbl">未支払い</div>
+    <div class="c-list">${unpaid.length?unpaid.map(rowHTML).join(''):'<div class="empty-row">データなし</div>'}</div>
+    <div class="sec-lbl">支払い済み</div>
+    <div class="c-list">${paid.length?paid.map(rowHTML).join(''):'<div class="empty-row">データなし</div>'}</div>
+    <div class="sec-lbl">合計</div>
+    <div class="sum-card">
+      <div class="sum-row"><span class="sum-lbl">未支払合計</span><span class="sum-val">${yen(unpaidTotal)}</span></div>
+      <div class="sum-row"><span class="sum-lbl">${whoName(oid)}との差額</span><span class="sum-val ${diffCls}">${diffStr}</span></div>
+    </div>
+    <div style="height:6px"></div>`;
   if(anim){el.classList.remove('anim-r','anim-l');void el.offsetWidth;el.classList.add(anim)}
 }
 
@@ -238,37 +317,150 @@ function openM(id){document.getElementById(id).classList.add('open')}
 function closeM(id){document.getElementById(id).classList.remove('open')}
 function bgClose(e,id){if(e.target===document.getElementById(id))closeM(id)}
 
+/* ─── 追加 ─── */
 function openAdd(){
   document.getElementById('f-date').value=nowISO();
   document.getElementById('f-amount').value='';
   document.getElementById('f-memo').value='';
   document.getElementById('f-paiddate').value=nowISO();
-  setWho(tab);setStatus('unpaid');openM('addModal');
+  setWho(tab); setStatus('unpaid'); openM('addModal');
 }
 function setWho(w){
   fWho=w;
   document.getElementById('t-me').className='tgl '+(w==='me'?'tgl-accent':'tgl-off');
   document.getElementById('t-partner').className='tgl '+(w==='partner'?'tgl-accent':'tgl-off');
 }
-function setStatus(s){fStatus=s;document.getElementById('t-unpaid').className='tgl '+(s==='unpaid'?'tgl-red':'tgl-off');document.getElementById('t-paid').className='tgl '+(s==='paid'?'tgl-green':'tgl-off');document.getElementById('paidDateRow').style.display=s==='paid'?'flex':'none'}
-
+function setStatus(s){
+  fStatus=s;
+  document.getElementById('t-unpaid').className='tgl '+(s==='unpaid'?'tgl-red':'tgl-off');
+  document.getElementById('t-paid').className='tgl '+(s==='paid'?'tgl-green':'tgl-off');
+  document.getElementById('paidDateRow').style.display=s==='paid'?'flex':'none';
+}
 function submitAdd(){
   const date=document.getElementById('f-date').value,amount=parseInt(document.getElementById('f-amount').value,10),memo=document.getElementById('f-memo').value.trim();
   if(!date||isNaN(amount)||amount<1){alert('発生日時と金額（1円以上）を入力してください');return}
   const paidDate=fStatus==='paid'?(document.getElementById('f-paiddate').value||date):null;
-  payments.push({id:uid(),date,amount,memo,who:whoId(fWho),status:fStatus,paidDate,createdAt:new Date().toISOString()});
-  payments.sort((a,b)=>b.date.localeCompare(a.date));persist();closeM('addModal');render();
+  payments.push({id:uid(),date,amount,memo,who:whoId(fWho),status:fStatus,paidDate,createdAt:new Date().toISOString(),history:[]});
+  payments.sort((a,b)=>b.date.localeCompare(a.date));
+  persist(); closeM('addModal'); render();
 }
 
+/* ─── 詳細 ─── */
 function openDetail(id){
   const p=payments.find(x=>x.id===id);if(!p)return;
-  document.getElementById('detBody').innerHTML=`<div class="det-title">${yen(p.amount)}</div><div class="det-row"><span class="det-k">ステータス</span><span class="det-v">${p.status==='paid'?'✅ 支払済み':'⏳ 未支払い'}</span></div><div class="det-row"><span class="det-k">支払者</span><span class="det-v">${whoName(p.who)}</span></div><div class="det-row"><span class="det-k">発生日時</span><span class="det-v">${fmtDT(p.date)}</span></div>${p.paidDate?`<div class="det-row"><span class="det-k">支払日時</span><span class="det-v">${fmtDT(p.paidDate)}</span></div>`:''} ${p.memo?`<div class="det-row"><span class="det-k">メモ</span><span class="det-v">${p.memo}</span></div>`:''}<div class="det-row"><span class="det-k">登録日時</span><span class="det-v">${fmtDT(p.createdAt)}</span></div>`;
-  const btn=document.createElement('button');btn.className='ok-btn';btn.style.cssText=`background:${p.status==='unpaid'?'var(--green)':'var(--accent)'};margin-bottom:0`;btn.textContent=p.status==='unpaid'?'✅ 支払済みにする':'↩ 未支払いに戻す';
-  btn.onclick=()=>{p.status=p.status==='unpaid'?'paid':'unpaid';p.paidDate=p.status==='paid'?new Date().toISOString():null;persist();closeM('detModal');render()};
+  const hist=(p.history||[]);
+  const histHTML=hist.length?`<div style="padding:4px 16px 8px;font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.05em">支払経過履歴</div><div class="hist-list">${hist.map(h=>`<div class="hist-item"><div><div class="hist-date">${fmtDT(h.date)}</div>${h.memo?`<div style="font-size:12px;color:var(--sub)">${h.memo}</div>`:''}</div><div class="hist-amount">${yen(h.amount)}</div></div>`).join('')}</div>`:'';
+
+  document.getElementById('detBody').innerHTML=`
+    <div class="det-title">${yen(p.amount)}</div>
+    <div class="det-row"><span class="det-k">ステータス</span><span class="det-v">${p.status==='paid'?'✅ 支払済み':p.status==='partial'?'🔄 一部支払':'⏳ 未支払い'}</span></div>
+    <div class="det-row"><span class="det-k">支払者</span><span class="det-v">${whoName(p.who)}</span></div>
+    <div class="det-row"><span class="det-k">発生日時</span><span class="det-v">${fmtDT(p.date)}</span></div>
+    ${p.paidDate?`<div class="det-row"><span class="det-k">支払日時</span><span class="det-v">${fmtDT(p.paidDate)}</span></div>`:''}
+    ${p.memo?`<div class="det-row"><span class="det-k">メモ</span><span class="det-v">${p.memo}</span></div>`:''}
+    <div class="det-row"><span class="det-k">登録日時</span><span class="det-v">${fmtDT(p.createdAt)}</span></div>
+    ${histHTML}`;
+
+  // ステータス変更ボタン
+  const btn=document.createElement('button');
+  btn.className='ok-btn';
+  btn.style.cssText=`background:${p.status==='unpaid'||p.status==='partial'?'var(--green)':'var(--accent)'};margin-bottom:6px`;
+  btn.textContent=p.status==='paid'?'↩ 未支払いに戻す':'✅ 支払済みにする';
+  btn.onclick=()=>{
+    p.status=p.status==='paid'?'unpaid':'paid';
+    p.paidDate=p.status==='paid'?new Date().toISOString():null;
+    persist(); closeM('detModal'); render();
+  };
   document.getElementById('detBody').appendChild(btn);
-  document.getElementById('delBtn').onclick=()=>{if(!confirm('削除しますか？'))return;payments=payments.filter(x=>x.id!==id);persist();closeM('detModal');render()};
+
+  // 途中支払いボタン（未払い・一部支払い時のみ）
+  if(p.status!=='paid'){
+    const pbtn=document.createElement('button');
+    pbtn.className='ok-btn';pbtn.style.cssText='background:#ff9500;margin-bottom:6px';
+    pbtn.textContent='🔄 途中支払いを記録';
+    pbtn.onclick=()=>{ partialTargetId=id; closeM('detModal'); openPartial(); };
+    document.getElementById('detBody').appendChild(pbtn);
+  }
+
+  document.getElementById('delBtn').onclick=()=>{
+    if(!confirm('削除しますか？'))return;
+    payments=payments.filter(x=>x.id!==id);
+    persist(); closeM('detModal'); render();
+  };
   openM('detModal');
 }
+
+/* ─── 途中支払い ─── */
+function openPartial(){
+  document.getElementById('p-amount').value='';
+  document.getElementById('p-date').value=nowISO();
+  document.getElementById('p-memo').value='';
+  openM('partialModal');
+}
+function submitPartial(){
+  const p=payments.find(x=>x.id===partialTargetId);if(!p)return;
+  const amount=parseInt(document.getElementById('p-amount').value,10);
+  const date=document.getElementById('p-date').value||nowISO();
+  const memo=document.getElementById('p-memo').value.trim();
+  if(isNaN(amount)||amount<1){alert('金額を入力してください');return}
+  if(amount>=p.amount){
+    // 全額以上なら支払済みに
+    p.status='paid'; p.paidDate=date;
+  } else {
+    // 残額を更新
+    p.amount=Math.max(0, p.amount-amount);
+    p.status='partial';
+  }
+  if(!p.history)p.history=[];
+  p.history.push({id:uid(),date,amount,memo});
+  persist(); closeM('partialModal'); render();
+}
+
+/* ─── 差額支払い ─── */
+function openDiffPay(){
+  const cid=tabId(),oid=tab==='me'?ptId():myId();
+  const myUnpaid=payments.filter(p=>p.who===cid&&(p.status==='unpaid'||p.status==='partial')).reduce((s,p)=>s+p.amount,0);
+  const ptUnpaid=payments.filter(p=>p.who===oid&&(p.status==='unpaid'||p.status==='partial')).reduce((s,p)=>s+p.amount,0);
+  const diff=ptUnpaid-myUnpaid;
+  document.getElementById('diffInfoTitle').textContent=diff>0?`${whoName(oid)}が多く払っている差額`:`${whoName(cid)}が多く払っている差額`;
+  document.getElementById('diffInfoVal').textContent=yen(Math.abs(diff));
+  document.getElementById('dp-amount').value=Math.abs(diff)>0?String(Math.abs(diff)):'';
+  document.getElementById('dp-date').value=nowISO();
+  document.getElementById('dp-memo').value='差額支払い';
+  openM('diffPayModal');
+}
+function submitDiffPay(){
+  const amount=parseInt(document.getElementById('dp-amount').value,10);
+  const date=document.getElementById('dp-date').value||nowISO();
+  const memo=document.getElementById('dp-memo').value.trim();
+  if(isNaN(amount)||amount<1){alert('金額を入力してください');return}
+
+  // 差額支払い：未払いを支払い額分だけ消化（大きい順に）
+  const cid=tabId(),oid=tab==='me'?ptId():myId();
+  const myUnpaid=payments.filter(p=>p.who===cid&&(p.status==='unpaid'||p.status==='partial')).reduce((s,p)=>s+p.amount,0);
+  const ptUnpaid=payments.filter(p=>p.who===oid&&(p.status==='unpaid'||p.status==='partial')).reduce((s,p)=>s+p.amount,0);
+
+  // 差額の少ない方が支払うべきもの（未払い）を消化
+  const targets=payments.filter(p=>(p.who===cid||p.who===oid)&&(p.status==='unpaid'||p.status==='partial'))
+    .sort((a,b)=>b.amount-a.amount);
+
+  let remaining=amount;
+  for(const p of targets){
+    if(remaining<=0)break;
+    if(!p.history)p.history=[];
+    if(remaining>=p.amount){
+      remaining-=p.amount;p.amount=0;p.status='paid';p.paidDate=date;
+      p.history.push({id:uid(),date,amount:p.amount,memo});
+    } else {
+      p.amount-=remaining;p.status='partial';
+      p.history.push({id:uid(),date,amount:remaining,memo});
+      remaining=0;
+    }
+  }
+  persist(); closeM('diffPayModal'); render();
+}
+
+/* ─── ガソリン代 ─── */
 function openGasCalc(){
   document.getElementById('g-distance').value='';
   document.getElementById('g-price').value='';
@@ -276,39 +468,28 @@ function openGasCalc(){
   document.getElementById('g-memo').value='ガソリン代';
   document.getElementById('g-result').textContent=yen(0);
   document.getElementById('g-claim-btn').disabled=true;
-  gasAmount=0;
-  setGasWho(tab);
-  openM('gasModal');
+  gasAmount=0; setGasWho(tab); openM('gasModal');
 }
-
 function setGasWho(w){
   gWho=w;
   document.getElementById('g-me').className='tgl '+(w==='me'?'tgl-accent':'tgl-off');
   document.getElementById('g-partner').className='tgl '+(w==='partner'?'tgl-accent':'tgl-off');
 }
-
 function calcGas(){
-  const distance=parseFloat(document.getElementById('g-distance').value);
+  const dist=parseFloat(document.getElementById('g-distance').value);
   const price=parseFloat(document.getElementById('g-price').value);
-  if(Number.isNaN(distance)||distance<0||Number.isNaN(price)||price<0){
-    alert('走行距離とガソリン価格を入力してください');
-    return;
-  }
-  const usage=distance/15;
-  gasAmount=Math.round(usage*price);
+  if(isNaN(dist)||dist<0||isNaN(price)||price<0){alert('走行距離とガソリン価格を入力してください');return}
+  gasAmount=Math.round((dist/15)*price);
   document.getElementById('g-result').textContent=yen(gasAmount);
   document.getElementById('g-claim-btn').disabled=gasAmount<=0;
 }
-
 function claimGas(){
   if(gasAmount<=0){alert('先に計算してください');return}
   const date=document.getElementById('g-date').value||nowISO();
   const memo=(document.getElementById('g-memo').value||'ガソリン代').trim();
-  payments.push({id:uid(),date,amount:gasAmount,memo,who:whoId(gWho),status:'unpaid',paidDate:null,createdAt:new Date().toISOString()});
+  payments.push({id:uid(),date,amount:gasAmount,memo,who:whoId(gWho),status:'unpaid',paidDate:null,createdAt:new Date().toISOString(),history:[]});
   payments.sort((a,b)=>b.date.localeCompare(a.date));
-  persist();
-  closeM('gasModal');
-  render();
+  persist(); closeM('gasModal'); render();
 }
 
 init();

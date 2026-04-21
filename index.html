@@ -8,7 +8,6 @@
 <title>ホーム</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="icon" href="photo/favicon.png">
-<link rel="apple-touch-icon" href="photo/favicon.png" >
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f2f2f7;--card:#fff;--text:#1c1c1e;--sub:#6b7280;--muted:#aeaeb2;--border:rgba(0,0,0,0.07);--accent:#7c7aff;--green:#34c759;--red:#ff3b30;--orange:#ff9500;--pink:#ff2d55;--blue:#007aff;--r:14px;--nav:62px}
@@ -21,11 +20,7 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
 .hdr-right{display:flex;align-items:flex-end;gap:8px}
 .user-chip{display:flex;align-items:center;gap:6px;background:var(--card);border-radius:20px;padding:6px 12px 6px 6px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.06);transition:background .15s}
 .user-chip:active{background:#e5e5ea}
-.user-chip-icon{font-size:20px}
-.user-chip-icon-img{width:20px;height:20px;border-radius:50%;object-fit:cover;display:block}
-.user-chip-name{font-size:12px;font-weight:600;color:var(--text)}
-.refresh-btn{width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--sub);box-shadow:0 1px 4px rgba(0,0,0,.06);transition:transform .3s,background .15s;flex-shrink:0}
-.refresh-btn:active{background:#e5e5ea}
+.refresh-btn{width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--sub);box-shadow:0 1px 4px rgba(0,0,0,.06);transition:transform .3s;flex-shrink:0}
 .refresh-btn.spin{animation:spin .5s ease}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .scroll{flex:1;overflow-y:auto;padding:10px 14px 20px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
@@ -50,11 +45,13 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
 .stat-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
 .notice-card{background:var(--card);border-radius:var(--r);padding:14px 16px;margin-bottom:6px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:background .12s;-webkit-tap-highlight-color:transparent}
 .notice-card:active{background:#f5f5fa}
+.notice-card.unread{border-left:3px solid var(--red)}
 .notice-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
 .nd-red{background:var(--red)}.nd-orange{background:var(--orange)}.nd-blue{background:var(--blue)}.nd-green{background:var(--green)}.nd-purple{background:var(--accent)}
 .notice-body{flex:1;min-width:0}
 .notice-title{font-size:14px;font-weight:500;color:var(--text);line-height:1.5}
 .notice-sub{font-size:12px;color:var(--sub);margin-top:2px}
+.notice-time{font-size:11px;color:var(--muted);margin-top:2px}
 .event-card{background:var(--card);border-radius:var(--r);padding:14px 16px;margin-bottom:6px;display:flex;align-items:center;gap:12px}
 .event-days{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
 .event-days-num{font-size:18px;font-weight:700;line-height:1}
@@ -66,7 +63,7 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
 .event-period{font-size:12px;color:var(--sub);margin-top:2px}
 .empty-small{padding:20px;text-align:center;font-size:13px;color:var(--muted);background:var(--card);border-radius:var(--r)}
 .nav{height:calc(var(--nav) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(250,250,250,.96);border-top:.5px solid var(--border);display:flex;align-items:flex-start;flex-shrink:0;backdrop-filter:blur(20px);z-index:30}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:10px 0 6px;border:none;background:none;-webkit-tap-highlight-color:transparent;transition:transform .1s}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:10px 0 6px;border:none;background:none;-webkit-tap-highlight-color:transparent;transition:transform .1s;position:relative}
 .nav-item:active{transform:scale(.88)}
 .nav-icon{font-size:20px;line-height:1}
 .nav-lbl{font-size:10px;font-weight:500;color:var(--muted)}
@@ -84,13 +81,13 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
     <div>
       <div class="hdr-greeting" id="greeting"></div>
       <div class="hdr-title">Risyu 💗</div>
-      <small>varsion.0.8</small>
+      <small style="font-size:10px;color:var(--muted)">version.0.9</small>
       <div class="hdr-date" id="todayDate"></div>
     </div>
     <div class="hdr-right">
-      <div class="user-chip" id="userChip" onclick="location.href='mypage.html'">
-        <span class="user-chip-icon" id="userIcon"></span>
-        <span class="user-chip-name" id="userName"></span>
+      <div class="user-chip" onclick="location.href='mypage.html'">
+        <span id="userIcon"></span>
+        <span id="userName" style="font-size:12px;font-weight:600;color:var(--text)"></span>
       </div>
       <button class="refresh-btn" id="refreshBtn" onclick="doRefresh()">🔄</button>
     </div>
@@ -103,11 +100,17 @@ html,body{height:100%;background:#c9c9ce;display:flex;justify-content:center;ali
 function yen(n){return'¥'+Number(n).toLocaleString()}
 function todayStr(){return new Date().toISOString().slice(0,10)}
 function loadPayments(){try{const d=JSON.parse(localStorage.getItem('pay_v1'));return Array.isArray(d)?d:[]}catch{return[]}}
-function loadWants(){try{const d=JSON.parse(localStorage.getItem('wants_v2')||localStorage.getItem('wants_v1'));return Array.isArray(d)?d:[]}catch{return[]}}
+function loadWants(){try{const d=JSON.parse(localStorage.getItem('wants_v1'));return Array.isArray(d)?d:[]}catch{return[]}}
 function loadStamp(){
   const u=currentUser();
-  const key='stamp_v1_'+u.id;
-  try{const d=JSON.parse(localStorage.getItem(key));return(d&&Array.isArray(d.cards))?d:{cards:[{cells:Array(30).fill(false),stampDates:Array(30).fill(null),completed:false,goal:'毎日の目標',startDate:new Date().toISOString()}]}}catch{return{cards:[{cells:Array(30).fill(false),stampDates:Array(30).fill(null),completed:false,goal:'毎日の目標',startDate:new Date().toISOString()}]}}
+  try{const d=JSON.parse(localStorage.getItem('stamp_v1_'+u.id));return(d&&Array.isArray(d.cards))?d:{cards:[{cells:Array(30).fill(false),stampDates:Array(30).fill(null),completed:false}]}}catch{return{cards:[{cells:Array(30).fill(false),stampDates:Array(30).fill(null),completed:false}]}}
+}
+function fmtTimeAgo(iso){
+  const diff=Date.now()-new Date(iso).getTime();
+  const m=Math.floor(diff/60000);
+  if(m<1)return'たった今';if(m<60)return`${m}分前`;
+  const h=Math.floor(m/60);if(h<24)return`${h}時間前`;
+  return`${Math.floor(h/24)}日前`;
 }
 
 function init(){
@@ -118,7 +121,7 @@ function init(){
   document.getElementById('userName').textContent=u.name;
   document.getElementById('nav').innerHTML=navHTML('home');
   renderHeader();render();
-  setInterval(()=>{renderHeader();render()},60000);
+  setInterval(()=>{renderHeader();render();},60000);
 }
 
 function renderHeader(){
@@ -138,19 +141,32 @@ function doRefresh(){
 function render(){
   const pays=loadPayments(),wants=loadWants(),stamp=loadStamp();
   const u=currentUser(),p=getAccount(partnerId());
-  const myId=u.id,pId=p.id;
-  const unMe=pays.filter(x=>x.who===myId&&x.status==='unpaid').reduce((s,x)=>s+x.amount,0);
-  const unPt=pays.filter(x=>x.who===pId&&x.status==='unpaid').reduce((s,x)=>s+x.amount,0);
+  const unMe=pays.filter(x=>x.who===u.id&&(x.status==='unpaid'||x.status==='partial')).reduce((s,x)=>s+x.amount,0);
+  const unPt=pays.filter(x=>x.who===p.id&&(x.status==='unpaid'||x.status==='partial')).reduce((s,x)=>s+x.amount,0);
   const diff=unPt-unMe,diffAbs=Math.abs(diff);
   const diffDesc=diff>0?`${p.name}が ${yen(diffAbs)} 多く払うべき状態`:diff<0?`${u.name}が ${yen(diffAbs)} 多く払うべき状態`:'お互いの支払いは釣り合っています ✨';
   const wTotal=wants.length,wDone=wants.filter(w=>w.status==='done').length,wPending=wants.filter(w=>w.status==='pending').length,wPct=wTotal?Math.round(wDone/wTotal*100):0;
   const lc=stamp.cards[stamp.cards.length-1];
   const sStamped=lc?lc.cells.filter(Boolean).length:0;
-  const sTodayDone=lc?lc.stampDates.some(d=>d&&d.startsWith(todayStr())):false;
+  // スタンプ今日判定（06:00基準）
+  const nowH=new Date().getHours();
+  const todayKey=nowH<6?new Date(Date.now()-86400000).toISOString().slice(0,10):todayStr();
+  const sTodayDone=lc?(lc.stampDays||[]).some(d=>d===todayKey)||lc.stampDates.some(d=>{if(!d)return false;const dt=new Date(d);const h=dt.getHours();const k=h<6?new Date(dt.setDate(dt.getDate()-1)).toISOString().slice(0,10):d.slice(0,10);return k===todayKey}):false;
   const sComp=lc?.completed||false,sPct=Math.round(sStamped/30*100);
-  const notices=buildNotices(pays,wants,lc,sTodayDone,sComp,u,p);
+
+  // お知らせ
+  const sysNotices=buildSysNotices(pays,wants,lc,sTodayDone,sComp,u,p);
+  const wantsNotifs=getNotifs().slice(0,5);
+  const hasUnread=getUnreadCount()>0;
+
+  // 期限が2ヶ月以内のやりたいこと
   const today=new Date();today.setHours(0,0,0,0);
-  const upcoming=wants.filter(w=>w.status==='pending'&&w.period).map(w=>{const e=parseEnd(w.period);return e?{...w,e,days:Math.ceil((e-today)/86400000)}:null}).filter(Boolean).sort((a,b)=>a.days-b.days).slice(0,4);
+  const twoMonths=new Date(today);twoMonths.setMonth(twoMonths.getMonth()+2);
+  const upcoming=wants.filter(w=>w.status==='pending'&&w.period).map(w=>{
+    const e=parseEnd(w.period);if(!e)return null;
+    const days=Math.ceil((e-today)/86400000);
+    return e<=twoMonths?{...w,e,days}:null;
+  }).filter(Boolean).sort((a,b)=>a.days-b.days).slice(0,5);
 
   document.getElementById('scroll').innerHTML=`
     <div class="hero-card section-anim">
@@ -158,31 +174,45 @@ function render(){
       <div class="hero-amount">${yen(diffAbs)}</div>
       <div class="hero-desc">${diffDesc}</div>
       <div class="hero-sub-row">
-        <div class="hero-sub-item"><div class="hero-sub-label">${iconHTML(u.icon,14)} ${u.name}の未払い</div><div class="hero-sub-val">${yen(unMe)}</div></div>
-        <div class="hero-sub-item"><div class="hero-sub-label">${iconHTML(p.icon,14)} ${p.name}の未払い</div><div class="hero-sub-val">${yen(unPt)}</div></div>
+        <div class="hero-sub-item"><div class="hero-sub-label">${iconHTML(u.icon,12)} ${u.name}の未払い</div><div class="hero-sub-val">${yen(unMe)}</div></div>
+        <div class="hero-sub-item"><div class="hero-sub-label">${iconHTML(p.icon,12)} ${p.name}の未払い</div><div class="hero-sub-val">${yen(unPt)}</div></div>
       </div>
     </div>
     <div class="grid2 section-anim">
       <div class="stat-card"><span class="stat-icon">📋</span><div class="stat-label">やりたいこと</div><div class="stat-value">${wPending}<span style="font-size:13px;font-weight:400;color:var(--sub)"> 件</span></div><div class="stat-sub">実行済み ${wDone} / 全 ${wTotal} 件</div><div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:${wPct}%;background:linear-gradient(90deg,var(--green),#86efac)"></div></div></div>
       <div class="stat-card"><span class="stat-icon">🔖</span><div class="stat-label">スタンプカード</div><div class="stat-value">${sStamped}<span style="font-size:13px;font-weight:400;color:var(--sub)"> / 30</span></div><div class="stat-sub">${sComp?'✨ コンプリート済み':sTodayDone?'✅ 今日は押した':'⏳ 今日未スタンプ'}</div><div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:${sPct}%;background:linear-gradient(90deg,var(--pink),#fb923c)"></div></div></div>
     </div>
-    ${notices.length?`<div class="sec-lbl section-anim">🔔 お知らせ (${notices.length})</div><div class="section-anim">${notices.map(n=>`<div class="notice-card" onclick="goTo('${n.screen||'home'}')"><div class="notice-dot ${n.dot}"></div><div class="notice-body"><div class="notice-title">${n.title}</div>${n.sub?`<div class="notice-sub">${n.sub}</div>`:''}</div></div>`).join('')}</div>`:''}
-    <div class="sec-lbl section-anim">📅 期限が近いやりたいこと</div>
-    <div class="section-anim">${upcoming.length?upcoming.map(w=>{let c='event-days';if(w.days<0)c+=' expired';else if(w.days===0)c+=' today';return`<div class="event-card"><div class="${c}"><div class="event-days-num">${w.days<=0?'—':w.days}</div><div class="event-days-lbl">${w.days>0?'日後':w.days===0?'今日':'終了'}</div></div><div class="event-body"><div class="event-title">${w.title}</div><div class="event-period">${w.period}</div></div></div>`}).join(''):'<div class="empty-small">期限付きの予定はありません</div>'}</div>
+    ${sysNotices.length||wantsNotifs.length?`
+    <div class="sec-lbl section-anim">🔔 お知らせ</div>
+    <div class="section-anim">
+      ${sysNotices.map(n=>`<div class="notice-card" onclick="goTo('${n.screen||'home'}')"><div class="notice-dot ${n.dot}"></div><div class="notice-body"><div class="notice-title">${n.title}</div>${n.sub?`<div class="notice-sub">${n.sub}</div>`:''}</div></div>`).join('')}
+      ${wantsNotifs.map(n=>`<div class="notice-card${n.read?'':' unread'}" onclick="goTo('wants')"><div class="notice-dot nd-purple"></div><div class="notice-body"><div class="notice-title">${n.msg}</div><div class="notice-time">${fmtTimeAgo(n.time)}</div></div></div>`).join('')}
+    </div>`:''}
+    <div class="sec-lbl section-anim">📅 2ヶ月以内のやりたいこと</div>
+    <div class="section-anim">${upcoming.length?upcoming.map(w=>{let c='event-days';if(w.days<0)c+=' expired';else if(w.days===0)c+=' today';return`<div class="event-card"><div class="${c}"><div class="event-days-num">${w.days<=0?'—':w.days}</div><div class="event-days-lbl">${w.days>0?'日後':w.days===0?'今日':'終了'}</div></div><div class="event-body"><div class="event-title">${w.title}</div><div class="event-period">${w.period}</div></div></div>`}).join(''):'<div class="empty-small">2ヶ月以内の期限付き予定はありません</div>'}</div>
     <div style="height:6px"></div>`;
 }
 
-function buildNotices(pays,wants,lc,sTodayDone,sComp,u,p){
+function buildSysNotices(pays,wants,lc,sTodayDone,sComp,u,p){
   const notices=[],today=new Date();today.setHours(0,0,0,0);
-  const unMe=pays.filter(x=>x.who===u.id&&x.status==='unpaid').reduce((s,x)=>s+x.amount,0);
-  const unPt=pays.filter(x=>x.who===p.id&&x.status==='unpaid').reduce((s,x)=>s+x.amount,0);
-  if(unMe>0)notices.push({dot:'nd-red',title:`${u.name}の未払いが ${yen(unMe)} あります`,sub:'支払い管理から確認できます',screen:'pay'});
-  if(unPt>0)notices.push({dot:'nd-orange',title:`${p.name}の未払いが ${yen(unPt)} あります`,sub:'支払い管理から確認できます',screen:'pay'});
+  const unMe=pays.filter(x=>x.who===u.id&&(x.status==='unpaid'||x.status==='partial')).reduce((s,x)=>s+x.amount,0);
+  const unPt=pays.filter(x=>x.who===p.id&&(x.status==='unpaid'||x.status==='partial')).reduce((s,x)=>s+x.amount,0);
+  if(unMe>0)notices.push({dot:'nd-red',title:`${u.name}の未払いが ${yen(unMe)} あります`,sub:'支払い管理から確認',screen:'pay'});
+  if(unPt>0)notices.push({dot:'nd-orange',title:`${p.name}の未払いが ${yen(unPt)} あります`,sub:'支払い管理から確認',screen:'pay'});
   if(!sComp&&!sTodayDone&&lc){const r=30-lc.cells.filter(Boolean).length;notices.push({dot:'nd-purple',title:'今日のスタンプがまだ押せます',sub:`残り ${r} マス`,screen:'stamp'})}
   wants.filter(w=>w.status==='pending'&&w.period).forEach(w=>{const e=parseEnd(w.period);if(!e)return;const days=Math.ceil((e-today)/86400000);if(days>=0&&days<=3)notices.push({dot:days===0?'nd-red':'nd-blue',title:`「${w.title}」の期限まであと ${days===0?'今日！':days+'日'}`,sub:w.period,screen:'wants'})});
   return notices;
 }
-function parseEnd(period){if(!period)return null;const m=period.match(/(\d{4}\/\d{1,2}\/\d{1,2})/g);if(!m||m.length<2)return null;const d=new Date(m[1].replace(/\//g,'-'));return isNaN(d)?null:d}
+function parseEnd(period){
+  if(!period)return null;
+  // 単一日付
+  const single=period.match(/^(\d{4}\/\d{1,2}\/\d{1,2})$/);
+  if(single){const d=new Date(single[1].replace(/\//g,'-'));return isNaN(d)?null:d}
+  // 範囲 (2番目の日付が終了日)
+  const m=period.match(/(\d{4}\/\d{1,2}\/\d{1,2})/g);
+  if(!m||m.length<2)return null;
+  const d=new Date(m[1].replace(/\//g,'-'));return isNaN(d)?null:d;
+}
 function goTo(s){const m={pay:'01_payment.html',wants:'02_wants.html',stamp:'03_stamp.html',bingo:'04_bingo.html',mypage:'mypage.html'};if(m[s])location.href=m[s]}
 
 init();
